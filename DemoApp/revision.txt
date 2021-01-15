@@ -1,0 +1,33 @@
+/******************************************************************************
+		 Program  Release  Note
+
+       	 Program  Name: DemoApp程序
+系统: Win XP/Win 7/Win 8 
+位数: 32/64位 
+工具: Miscrosoft Visual C++ 6.0
+/******************************************************************************
+	FileName : DemoApp.exe
+	FileFunc : 实现简单的应用
+    Version  : V0.0.1
+    Author   : Sunrier 
+    Date     : 2015-02-08 15:00:15
+	Descp    : 1.实现http交易测试接口应用
+	History  : None
+/******************************************************************************
+	FileName : DemoApp.exe
+	FileFunc : 实现简单的应用
+    Version  : V0.0.1
+    Author   : Sunrier 
+    Date     : 2013-05-08 15:00:15
+	Descp    : 1.实现FTP交易测试接口应用
+	History  : None
+/******************************************************************************
+	FileName : DemoApp.exe
+	FileFunc : 实现简单的应用
+    Version  : V0.0.1
+    Author   : Sunrier 
+    Date     : 2013-02-08 15:00:15
+	Descp    : 1.实现银行回响交易测试接口应用
+	History  : None
+/*****************************************************************************
+
