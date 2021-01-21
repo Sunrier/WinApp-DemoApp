@@ -1078,6 +1078,65 @@ unsigned char App_InitComm(unsigned char ucAppFlag)
 }
 
 /***********************************************************************************************
+	FuncName : App_GetVersion
+    FuncFunc : 获取项目版本信息
+	Input	 : None
+	Output	 : None
+	Return	 : unsigned char	— 成功,返回APP_SUCCESS
+								— 失败,返回APP_FAILURE
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+unsigned char App_GetVersion( void )
+{
+	unsigned char ucRetCode = APP_FAILURE;
+	unsigned char aucVersion[256];	
+	
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter App_GetVersion!");
+
+	memset(aucVersion,0,sizeof(aucVersion));
+	ucRetCode = Tool_GetLibVersion(aucVersion);
+	if( ucRetCode )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_GetLibVersion fail,ucRetCode[0x%02X]!",ucRetCode);
+		return APP_FAILURE;
+	}
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_GetLibVersion aucVersion[%s]!",aucVersion);
+
+	memset(aucVersion,0,sizeof(aucVersion));
+	ucRetCode = AppUtils_GetLibVersion(aucVersion);
+	if( ucRetCode )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AppUtils_GetLibVersion fail,ucRetCode[0x%02X]!",ucRetCode);
+		return APP_FAILURE;
+	}
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AppUtils_GetLibVersion aucVersion[%s]!",aucVersion);
+
+	memset(aucVersion,0,sizeof(aucVersion));
+	ucRetCode = WComm_GetLibVersion(aucVersion);
+	if( ucRetCode )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "WComm_GetLibVersion fail,ucRetCode[0x%02X]!",ucRetCode);
+		return APP_FAILURE;
+	}
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "WComm_GetLibVersion aucVersion[%s]!",aucVersion);
+
+	memset(aucVersion,0,sizeof(aucVersion));
+	ucRetCode = Comm_GetLibVersion(aucVersion);
+	if( ucRetCode )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_GetLibVersion fail,ucRetCode[0x%02X]!",ucRetCode);
+		return APP_FAILURE;
+	}
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_GetLibVersion aucVersion[%s]!",aucVersion);
+	
+	return APP_SUCCESS;
+}
+
+/***********************************************************************************************
 	FuncName : App_SetCommCfg
     FuncFunc : 设置项目默认通讯配置信息
 	Input	 : None
@@ -1536,6 +1595,12 @@ unsigned char App_Init( void )
 		return ucRetCode;
 	}
 
+	ucRetCode = App_GetVersion();
+	if( APP_SUCCESS!=ucRetCode )
+	{
+		return ucRetCode;
+	}
+	
 	ucRetCode = App_GetCommCfg();
 	if( APP_SUCCESS!=ucRetCode )
 	{

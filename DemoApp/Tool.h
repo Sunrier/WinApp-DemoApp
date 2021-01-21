@@ -133,6 +133,14 @@ typedef struct _TLV
 	unsigned char *pucValue;	/*pucValue*/
 }TLV;
 
+/*权重系数比例信息*/
+typedef struct
+{
+	int iIndex;
+	double dWeight;
+	long lPercent;
+}WEIGHTFACTOR_PRM;
+
 /*子集集合参数结构体*/
 typedef struct
 {
@@ -1930,10 +1938,10 @@ EXPORT int Tool_StrCopyEx(const unsigned char *pucInputData,int iOutputDataLen,u
 	FuncFunc : 查找字符串中最后一个字符出现的开始位置
 	Input	 : unsigned char *	— pucInputData			输入字符串
 			   unsigned int 	— ucInputCh			截取的字符
-			   unsigned char 	— ucCutFlag			ucCutFlag:0x00-截取位置从最后一个出现的字符开始 
-			                                                      0x01-截取位置从最后一个出现的字符后面开始 
-			                                                      0x02-截取位置开始位置到从最后一个出现的字符(包括此字符)
-			                                                      0x03-截取位置开始位置到从最后一个出现的字符(不包括此字符)
+			   unsigned char 	— ucCutFlag			ucCutFlag:0x00-截取位置从最后一个出现的字符开始
+			                                                      0x01-截取位置从最后一个出现的字符后面开始
+			                                                      0x02-截取位置从开始位置到最后一个出现的字符(包括此字符)
+			                                                      0x03-截取位置从开始位置到最后一个出现的字符(不包括此字符)
 			                                                      其它-截取位置从最后一个出现的字符开始
 	Output	 : unsigned char *	— pucOutputData		输出字符串
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
@@ -3556,6 +3564,45 @@ EXPORT unsigned char Tool_GetAnnualInterestRate(double dOrgPrincipal,double dFin
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_GetInterestYear(double dPrincipal,double dInterest,double dInterestRate,unsigned int *puiInterestYear);
+
+/***********************************************************************************************
+	FuncName : Tool_GetExpWeightFactor
+	FuncFunc : 获取指数权重系数比例分配
+	Input	 : WEIGHTFACTOR_PRM *	— pWeightFactor    输入的权重系数信息
+	           unsigned int			— uiWeightNum    	输入的权重数量
+	           double				— dMinWeight    	输入的最小权重
+	           long					— lPrecision    	输入的总比例
+	           unsigned char		— ucPercentFactor  输入的权重系数比例分配因子:0-权重系数越大比例分配越小 
+	                                                                               1-权重系数越大比例分配越大
+	Output	 : WEIGHTFACTOR_PRM *	— pWeightFactor    输出的权重系数信息
+	Return	 : unsigned char		— 成功,返回TOOL_SUCCESS(0x00)
+									— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2015-04-09 19:10:22
+	Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetExpWeightFactor(WEIGHTFACTOR_PRM pWeightFactor[],unsigned int uiWeightNum,double dMinWeight,long lPrecision,unsigned char ucPercentFactor);
+
+/***********************************************************************************************
+	FuncName : Tool_GetWeightFactor
+	FuncFunc : 获取标准权重系数比例分配
+	Input	 : WEIGHTFACTOR_PRM *	— pWeightFactor    输入的权重系数信息
+	           unsigned int			— uiWeightNum    	输入的权重数量
+	           long					— lPrecision    	输入的总比例
+	           unsigned char		— ucPercentFactor  输入的权重系数比例分配因子:0-权重系数越大比例分配越小 
+	                                                                               1-权重系数越大比例分配越大
+	Output	 : WEIGHTFACTOR_PRM *	— pWeightFactor    输出的权重系数信息
+	Return	 : unsigned char		— 成功,返回TOOL_SUCCESS(0x00)
+									— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2015-04-09 19:10:22
+	Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetWeightFactor(WEIGHTFACTOR_PRM pWeightFactor[],unsigned int uiWeightNum,long lPrecision,unsigned char ucPercentFactor);
 
 /***********************************************************************************************
 	FuncName : Tool_GetComputerName
