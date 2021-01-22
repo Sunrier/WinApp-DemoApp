@@ -83,8 +83,13 @@ unsigned char App_Test( void )
 
 	strcpy(aucOrgAmount,"10");
 	strcpy(aucCurAmount,"16.9");
-	Tool_GetROI(aucOrgAmount,aucCurAmount);
-	
+	memset(aucBuffer,0,sizeof(aucBuffer));
+	Tool_GetRoi(aucOrgAmount,aucCurAmount,0,aucBuffer);
+	printf("aucBuffer[%s]\n",aucBuffer);
+
+	memset(aucBuffer,0,sizeof(aucBuffer));
+	Tool_GetRoi(aucOrgAmount,aucCurAmount,1,aucBuffer);
+	printf("aucBuffer[%s]\n",aucBuffer);
 	AppUtils_WaitKey(500);
 
 	return 0;

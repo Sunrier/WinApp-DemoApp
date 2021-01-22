@@ -3566,6 +3566,23 @@ EXPORT unsigned char Tool_GetAnnualInterestRate(double dOrgPrincipal,double dFin
 EXPORT unsigned char Tool_GetInterestYear(double dPrincipal,double dInterest,double dInterestRate,unsigned int *puiInterestYear);
 
 /***********************************************************************************************
+	FuncName : Tool_GetRoi
+	FuncFunc : 获取ROI
+	Input	 : unsigned char *	— pucInputData1    输入的原始金额
+	           unsigned char *	— pucInputData2    输入的当前金额
+	           unsigned char 	— ucRoiFlag    	输入的ROI格式标志:0-不带百分比 非0-带百分比
+	Output	 : unsigned char *	— pucOutputData    输出ROI
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2015-04-09 19:10:22
+	Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetRoi(unsigned char *pucInputData1,unsigned char *pucInputData2,unsigned char ucRoiFlag,unsigned char *pucOutputData);
+
+/***********************************************************************************************
 	FuncName : Tool_GetExpWeightFactor
 	FuncFunc : 获取指数权重系数比例分配
 	Input	 : WEIGHTFACTOR_PRM *	— pWeightFactor    输入的权重系数信息
