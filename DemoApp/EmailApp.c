@@ -64,7 +64,7 @@ unsigned char EmailApp_InitComm(void *pDummy,unsigned char *pucEmailFromMail,uns
 	strcpy(pucEmailUserName,aucTmpBuf);
 
 	memset(aucTmpBuf,0,sizeof(aucTmpBuf));
-	ucRetCode = Tool_Strrchr(pucEmailFromMail,'@',0x00,aucTmpBuf);
+	ucRetCode = Tool_Strrchr(pucEmailFromMail,'@',0x01,aucTmpBuf);
 	if( ucRetCode || (!strlen(aucTmpBuf)) )
 	{
 		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Get Email server domain name fail!");
@@ -74,37 +74,19 @@ unsigned char EmailApp_InitComm(void *pDummy,unsigned char *pucEmailFromMail,uns
 	memset(aucEmailSmtp,0,sizeof(aucEmailSmtp));
 	memset(aucEmailServerDomain,0,sizeof(aucEmailServerDomain));
 	iLen = strlen(aucTmpBuf);
-	if( (iLen<=1) || ('@'!=aucTmpBuf[0]) )
+	if( iLen<EMAILAPP_HOSTDOMAINNAME_MINLEN )
 	{
 		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param,pucEmailFromMail[%s]!",pucEmailFromMail);
 		return APP_FAILURE;
 	}
-
-	iJ = 0;
 	memset(aucDomainName,0,sizeof(aucDomainName));
-	for(iI=1; iI<iLen; iI++)
-	{
-		if( '.'==aucTmpBuf[iI] )
-		{
-			break;
-		}
-		aucDomainName[iJ] = aucTmpBuf[iI];
-		++iJ;
-	}
-
-	if( iJ<=0 )
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param,pucEmailFromMail[%s]!",pucEmailFromMail);
-		return APP_FAILURE;
-	}
-
+	strcpy(aucDomainName,aucTmpBuf);
 	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucDomainName[%s]!",aucDomainName);
 
-	sprintf(aucEmailSmtp,"smtp.%s.com",aucDomainName);
-	sprintf(aucEmailServerDomain,"https://smtp.%s.com",aucDomainName);
-	sprintf(pucEmailServerHostName,"%s.com",aucDomainName);
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucEmailSmtp[%s],aucEmailServerDomain[%s],pucEmailServerHostName[%s]!",aucEmailSmtp,aucEmailServerDomain,pucEmailServerHostName);
-	
+	sprintf(aucEmailSmtp,"smtp.%s",aucDomainName);
+	sprintf(aucEmailServerDomain,"https://smtp.%s",aucDomainName);
+	sprintf(pucEmailServerHostName,"%s",aucDomainName);
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucEmailSmtp[%s],aucEmailServerDomain[%s],pucEmailServerHostName[%s]!",aucEmailSmtp,aucEmailServerDomain,pucEmailServerHostName);	
 	ucRetCode = Comm_GetInfoFromUrl(aucEmailServerDomain,1,aucEmailServerIP,NULL,NULL,NULL);
 	if( ucRetCode )
 	{
@@ -384,19 +366,19 @@ unsigned char EmailApp_GetBoundary(unsigned char *pucFromEmail,unsigned char *pu
 	unsigned char ucRetCode = APP_SUCCESS;
 	unsigned int uiBoundaryLen = 0,uiMaxBoundaryLen = 0;
 	unsigned int uiResultLen = 0,uiResultHexLen = 0;
-	unsigned char aucBoundary[64+1];
+	unsigned char aucBoundary[EMAILAPP_BOUNDARY_MAXLEN+1];
 	unsigned char aucTmpBuf[128+1];
 	unsigned char aucResult[256+1],aucRandResult[256+1],aucBeforeResult[256+1],aucResultHex[128+1];
 	long lSeconds = 0;
 	unsigned int uiRand = 0;
 	unsigned long ulMSeconds = 0;
 	UINT64 ui64Data = 0;
-
-	if( (NULL==pucFromEmail) || (strlen(pucFromEmail)<4) )
+	
+	if( (NULL==pucFromEmail) || (strlen(pucFromEmail)<EMAILAPP_EMAILADDR_MINLEN) || (strlen(pucFromEmail)>EMAILAPP_EMAILADDR_MAXLEN) )
 	{
 		return APP_PARAMERROR;
 	}
-
+	
 	if( (NULL==pucOutputData) || (NULL==puiOutputDataLen) || (!*puiOutputDataLen) )
 	{
 		return APP_PARAMERROR;
@@ -472,6 +454,93 @@ unsigned char EmailApp_GetBoundary(unsigned char *pucFromEmail,unsigned char *pu
 }
 
 /***********************************************************************************************
+	FuncName : EmailApp_CheckMailAddr
+    FuncFunc : 检查邮件地址信息是否合法
+	Input	 : unsigned char *	— pucInputData,输入邮件地址信息
+	Output	 : None
+	Return	 : unsigned char	— 合法,返回APP_SUCCESS
+								— 不合法,返回APP_FAILURE
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+unsigned char EmailApp_CheckMailAddr(unsigned char *pucInputData)
+{
+	unsigned char ucRetCode = APP_SUCCESS;
+	unsigned char ucEmailFlag = 0,ucOrgFlag = 0;
+	int iI = 0,iLen = 0;
+	int iFlagBeforeLen = 0,iFlagAfterLen = 0;
+
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_CheckMailAddr!");
+	
+	if( (NULL==pucInputData) || (!strlen(pucInputData)) )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param!");
+		return APP_PARAMERROR;
+	}
+
+	/*邮件@标志*/
+	ucEmailFlag = 0;
+	iFlagBeforeLen = 0;
+	iFlagAfterLen = 0;
+
+	/*邮件组织标志.*/
+	ucOrgFlag = 0;
+	iLen = strlen(pucInputData);
+	for(iI=0; iI<iLen; iI++)
+	{
+		if( '@'==pucInputData[iI] )
+		{
+			++ucEmailFlag;
+			if( ucEmailFlag>1 )
+			{
+				return APP_FAILURE;
+			}
+		}
+		else if( '.'==pucInputData[iI] )
+		{
+			++ucOrgFlag;
+			if( ucOrgFlag>1 )
+			{
+				return APP_FAILURE;
+			}
+		}	
+
+		if( !ucEmailFlag )
+		{
+			++iFlagBeforeLen;
+		}
+		else if( ucEmailFlag )
+		{
+			++iFlagAfterLen;
+		}
+	}
+
+	if( 1!=ucEmailFlag )
+	{
+		return APP_FAILURE;
+	}
+	else if( 1!=ucOrgFlag )
+	{
+		return APP_FAILURE;
+	}
+
+	if( (iFlagBeforeLen<EMAILAPP_USERNAME_MINLEN) || (iFlagBeforeLen>EMAILAPP_USERNAME_MAXLEN) )
+	{
+		return APP_FAILURE;
+	}
+	
+	if( (iFlagAfterLen<EMAILAPP_HOSTDOMAINNAME_MINLEN) || (iFlagAfterLen>EMAILAPP_HOSTDOMAINNAME_MAXLEN) )
+	{
+		return APP_FAILURE;
+	}
+	
+	return APP_SUCCESS;
+}
+
+/***********************************************************************************************
 	FuncName : EmailApp_InitMail
     FuncFunc : 初始化邮件信息
 	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
@@ -506,7 +575,7 @@ unsigned char EmailApp_InitMail(EMAIL_PRM *pEmailInfo)
 	strcpy(pEmailInfo->aucCharset,"GBK");
 
 	/*邮件头信息(如邮件地址)是否编码:0-不编码 1-GB2312编码 2-UTF8编码 其他-GB2312编码*/
-	pEmailInfo->ucHeadEncodeFlag = 1;
+	//pEmailInfo->ucHeadEncodeFlag = 1;
 	
 	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucFromEmail[%s]!",pEmailInfo->mFromEmail.aucFromEmail);
 	
@@ -551,6 +620,12 @@ unsigned char EmailApp_SetFromMail(EMAIL_PRM *pEmailInfo)
 	}
 	Tool_StrTrim(aucInputBuf,4);
 	Tool_StrLowerCase(aucInputBuf);
+	ucRetCode = EmailApp_CheckMailAddr(aucInputBuf);
+	if( ucRetCode )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_CheckMailAddr FromEmail[%s] fail,!",aucInputBuf);
+		return APP_FAILURE;
+	}
 	strcpy(pEmailInfo->mFromEmail.aucFromEmail,aucInputBuf);
 
 	memset(aucDispTitle,0,sizeof(aucDispTitle));
@@ -579,200 +654,6 @@ unsigned char EmailApp_SetFromMail(EMAIL_PRM *pEmailInfo)
 }
 
 
-/***********************************************************************************************
-	FuncName : EmailApp_DispFromMail
-    FuncFunc : 显示发送的邮件信息
-	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
-	Output	 : None
-	Return	 : unsigned char	— 成功,返回APP_SUCCESS
-								— 失败,返回APP_FAILURE
-    Author	 : Sunrier
-    Date     : 2016-12-23 10:10:22
-    Descp    : None
-	History  : None
-	Other    : None
-*************************************************************************************************/
-unsigned char EmailApp_DispFromMail(EMAIL_PRM *pEmailInfo)
-{
-	//unsigned char ucRetCode = APP_SUCCESS;
-	//unsigned char aucTmpBuf[128+1];
-
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_DispFromMail!");
-	
-	if( NULL==pEmailInfo )
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param!");
-		return APP_PARAMERROR;
-	}
-	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucFromEmail[%s]!",pEmailInfo->mFromEmail.aucFromEmail);
-	
-	return APP_SUCCESS;
-}
-
-/***********************************************************************************************
-	FuncName : EmailApp_DispToMail
-    FuncFunc : 显示邮件接收的邮件组信息
-	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
-	Output	 : None
-	Return	 : unsigned char	— 成功,返回APP_SUCCESS
-								— 失败,返回APP_FAILURE
-    Author	 : Sunrier
-    Date     : 2016-12-23 10:10:22
-    Descp    : None
-	History  : None
-	Other    : None
-*************************************************************************************************/
-unsigned char EmailApp_DispToMail(EMAIL_PRM *pEmailInfo)
-{
-	unsigned char ucRetCode = APP_SUCCESS;
-	int iI = 0,iToEmailNum = 0;
-	//unsigned char aucTmpBuf[128+1];
-
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_DispToMail!");
-	
-	if( NULL==pEmailInfo )
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param!");
-		return APP_PARAMERROR;
-	}
-	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"iToEmailNum[%d]!",pEmailInfo->mToEmailGroup.iToEmailNum);
-
-	iToEmailNum = pEmailInfo->mToEmailGroup.iToEmailNum;
-	for(iI=0; iI<iToEmailNum; iI++)
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucToEmail[%s] of [%d/%d]!",pEmailInfo->mToEmailGroup.mToEmail[iI].aucToEmail,iI+1,iToEmailNum);
-	}
-	
-	return APP_SUCCESS;
-}
-
-/***********************************************************************************************
-	FuncName : EmailApp_DispCcMail
-    FuncFunc : 显示邮件接收的抄送邮件组信息
-	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
-	Output	 : None
-	Return	 : unsigned char	— 成功,返回APP_SUCCESS
-								— 失败,返回APP_FAILURE
-    Author	 : Sunrier
-    Date     : 2016-12-23 10:10:22
-    Descp    : None
-	History  : None
-	Other    : None
-*************************************************************************************************/
-unsigned char EmailApp_DispCcMail(EMAIL_PRM *pEmailInfo)
-{
-	unsigned char ucRetCode = APP_SUCCESS;
-	int iI = 0,iCcEmailNum = 0;
-	//unsigned char aucTmpBuf[128+1];
-
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_DispCcMail!");
-	
-	if( NULL==pEmailInfo )
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param!");
-		return APP_PARAMERROR;
-	}
-	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"iCcEmailNum[%d]!",pEmailInfo->mCcEmailGroup.iCcEmailNum);
-
-	iCcEmailNum = pEmailInfo->mCcEmailGroup.iCcEmailNum;
-	for(iI=0; iI<iCcEmailNum; iI++)
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucCcEmail[%s] of [%d/%d]!",pEmailInfo->mCcEmailGroup.mCcEmail[iI].aucToEmail,iI+1,iCcEmailNum);
-	}
-	
-	return APP_SUCCESS;
-}
-
-/***********************************************************************************************
-	FuncName : EmailApp_DispBccMail
-    FuncFunc : 显示邮件接收的密送邮件组信息
-	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
-	Output	 : None
-	Return	 : unsigned char	— 成功,返回APP_SUCCESS
-								— 失败,返回APP_FAILURE
-    Author	 : Sunrier
-    Date     : 2016-12-23 10:10:22
-    Descp    : None
-	History  : None
-	Other    : None
-*************************************************************************************************/
-unsigned char EmailApp_DispBccMail(EMAIL_PRM *pEmailInfo)
-{
-	unsigned char ucRetCode = APP_SUCCESS;
-	int iI = 0,iBccEmailNum = 0;
-	//unsigned char aucTmpBuf[128+1];
-
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_DispBccMail!");
-	
-	if( NULL==pEmailInfo )
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param!");
-		return APP_PARAMERROR;
-	}
-	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"iBccEmailNum[%d]!",pEmailInfo->mBccEmailGroup.iBccEmailNum);
-
-	iBccEmailNum = pEmailInfo->mBccEmailGroup.iBccEmailNum;
-	for(iI=0; iI<iBccEmailNum; iI++)
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucBccEmail[%s] of [%d/%d]!",pEmailInfo->mBccEmailGroup.mBccEmail[iI].aucToEmail,iI+1,iBccEmailNum);
-	}
-	
-	return APP_SUCCESS;
-}
-
-/***********************************************************************************************
-	FuncName : EmailApp_DispMail
-    FuncFunc : 显示邮件接收的邮件组信息
-	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
-	Output	 : None
-	Return	 : unsigned char	— 成功,返回APP_SUCCESS
-								— 失败,返回APP_FAILURE
-    Author	 : Sunrier
-    Date     : 2016-12-23 10:10:22
-    Descp    : None
-	History  : None
-	Other    : None
-*************************************************************************************************/
-unsigned char EmailApp_DispMail(EMAIL_PRM *pEmailInfo)
-{
-	unsigned char ucRetCode = APP_SUCCESS;
-
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_DispMail!");
-
-	ucRetCode = EmailApp_DispFromMail(pEmailInfo);
-	if( ucRetCode )
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_DispFromMail fail,ucRetCode[0x%02X]!",ucRetCode);
-		return ucRetCode;
-	}
-	
-	ucRetCode = EmailApp_DispToMail(pEmailInfo);
-	if( ucRetCode )
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_DispToMail fail,ucRetCode[0x%02X]!",ucRetCode);
-		return ucRetCode;
-	}
-
-	ucRetCode = EmailApp_DispCcMail(pEmailInfo);
-	if( ucRetCode )
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_DispCcMail fail,ucRetCode[0x%02X]!",ucRetCode);
-		return ucRetCode;
-	}
-
-	ucRetCode = EmailApp_DispBccMail(pEmailInfo);
-	if( ucRetCode )
-	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_DispBccMail fail,ucRetCode[0x%02X]!",ucRetCode);
-		return ucRetCode;
-	}
-	
-	return APP_SUCCESS;
-}
 
 /***********************************************************************************************
 	FuncName : EmailApp_SetToMail
@@ -862,6 +743,13 @@ unsigned char EmailApp_SetToMail(EMAIL_PRM *pEmailInfo)
 				if( iCurIndex>=EMAILAPP_TOEMAIL_MAXNUM )
 				{
 					Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"iToEmailNum[%d] has been reached max[%d]!",iCurIndex,EMAILAPP_TOEMAIL_MAXNUM);
+					return APP_FAILURE;
+				}
+
+				ucRetCode = EmailApp_CheckMailAddr(aucTmpBuf);
+				if( ucRetCode )
+				{
+					Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_CheckMailAddr ToEmail curIndex[%d],curToEmail[%s] fail,!",iCurIndex,aucTmpBuf);
 					return APP_FAILURE;
 				}
 				
@@ -986,6 +874,13 @@ unsigned char EmailApp_SetCcMail(EMAIL_PRM *pEmailInfo)
 					Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"iCcEmailNum[%d] has been reached max[%d]!",iCurIndex,EMAILAPP_CCEMAIL_MAXNUM);
 					return APP_FAILURE;
 				}
+
+				ucRetCode = EmailApp_CheckMailAddr(aucTmpBuf);
+				if( ucRetCode )
+				{
+					Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_CheckMailAddr CcEmail curIndex[%d],curCcEmail[%s] fail,!",iCurIndex,aucTmpBuf);
+					return APP_FAILURE;
+				}
 				
 				strcat(pEmailInfo->mCcEmailGroup.mCcEmail[iCurIndex].aucToEmail,aucTmpBuf);
 				++iCurIndex;
@@ -1108,6 +1003,13 @@ unsigned char EmailApp_SetBccMail(EMAIL_PRM *pEmailInfo)
 					Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"iBccEmailNum[%d] has been reached max[%d]!",iCurIndex,EMAILAPP_BCCEMAIL_MAXNUM);
 					return APP_FAILURE;
 				}
+
+				ucRetCode = EmailApp_CheckMailAddr(aucTmpBuf);
+				if( ucRetCode )
+				{
+					Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_CheckMailAddr BccEmail curIndex[%d],curBccEmail[%s] fail,!",iCurIndex,aucTmpBuf);
+					return APP_FAILURE;
+				}
 				
 				strcat(pEmailInfo->mBccEmailGroup.mBccEmail[iCurIndex].aucToEmail,aucTmpBuf);
 				++iCurIndex;
@@ -1202,7 +1104,6 @@ unsigned char EmailApp_SetMailText(EMAIL_PRM *pEmailInfo)
 	
 	memset(aucInputBuf,0,sizeof(aucInputBuf));
 	ucRetCode = AppUtils_GetText(LINE2,"请输入邮件文本:",aucInputBuf,2,1024,0,60);
-	//ucRetCode = AppUtils_GetCN(LINE2,"请输入邮件文本:",aucInputBuf,2,1024,60);
 	if( (APP_SUCCESS!=ucRetCode) || (!strlen(aucInputBuf)) )
 	{
 		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"AppUtils_GetText fail,ucRetCode[0x%02X]!",ucRetCode);
@@ -1328,6 +1229,195 @@ unsigned char EmailApp_SetMailBoundary(EMAIL_PRM *pEmailInfo)
 	
 	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucBoundary[%s]!",pEmailInfo->mFromEmail.aucBoundary);
 
+	return APP_SUCCESS;
+}
+
+/***********************************************************************************************
+	FuncName : EmailApp_DispFromMail
+    FuncFunc : 显示发送的邮件信息
+	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
+	Output	 : None
+	Return	 : unsigned char	— 成功,返回APP_SUCCESS
+								— 失败,返回APP_FAILURE
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+unsigned char EmailApp_DispFromMail(EMAIL_PRM *pEmailInfo)
+{
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_DispFromMail!");
+	
+	if( NULL==pEmailInfo )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param!");
+		return APP_PARAMERROR;
+	}
+	
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucFromEmail[%s]!",pEmailInfo->mFromEmail.aucFromEmail);
+	
+	return APP_SUCCESS;
+}
+
+/***********************************************************************************************
+	FuncName : EmailApp_DispToMail
+    FuncFunc : 显示邮件接收的邮件组信息
+	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
+	Output	 : None
+	Return	 : unsigned char	— 成功,返回APP_SUCCESS
+								— 失败,返回APP_FAILURE
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+unsigned char EmailApp_DispToMail(EMAIL_PRM *pEmailInfo)
+{
+	unsigned char ucRetCode = APP_SUCCESS;
+	int iI = 0,iToEmailNum = 0;
+
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_DispToMail!");
+	
+	if( NULL==pEmailInfo )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param!");
+		return APP_PARAMERROR;
+	}
+	
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"iToEmailNum[%d]!",pEmailInfo->mToEmailGroup.iToEmailNum);
+
+	iToEmailNum = pEmailInfo->mToEmailGroup.iToEmailNum;
+	for(iI=0; iI<iToEmailNum; iI++)
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucToEmail[%s] of [%d/%d]!",pEmailInfo->mToEmailGroup.mToEmail[iI].aucToEmail,iI+1,iToEmailNum);
+	}
+	
+	return APP_SUCCESS;
+}
+
+/***********************************************************************************************
+	FuncName : EmailApp_DispCcMail
+    FuncFunc : 显示邮件接收的抄送邮件组信息
+	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
+	Output	 : None
+	Return	 : unsigned char	— 成功,返回APP_SUCCESS
+								— 失败,返回APP_FAILURE
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+unsigned char EmailApp_DispCcMail(EMAIL_PRM *pEmailInfo)
+{
+	unsigned char ucRetCode = APP_SUCCESS;
+	int iI = 0,iCcEmailNum = 0;
+
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_DispCcMail!");
+	
+	if( NULL==pEmailInfo )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param!");
+		return APP_PARAMERROR;
+	}
+	
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"iCcEmailNum[%d]!",pEmailInfo->mCcEmailGroup.iCcEmailNum);
+
+	iCcEmailNum = pEmailInfo->mCcEmailGroup.iCcEmailNum;
+	for(iI=0; iI<iCcEmailNum; iI++)
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucCcEmail[%s] of [%d/%d]!",pEmailInfo->mCcEmailGroup.mCcEmail[iI].aucToEmail,iI+1,iCcEmailNum);
+	}
+	
+	return APP_SUCCESS;
+}
+
+/***********************************************************************************************
+	FuncName : EmailApp_DispBccMail
+    FuncFunc : 显示邮件接收的密送邮件组信息
+	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
+	Output	 : None
+	Return	 : unsigned char	— 成功,返回APP_SUCCESS
+								— 失败,返回APP_FAILURE
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+unsigned char EmailApp_DispBccMail(EMAIL_PRM *pEmailInfo)
+{
+	unsigned char ucRetCode = APP_SUCCESS;
+	int iI = 0,iBccEmailNum = 0;
+
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_DispBccMail!");
+	
+	if( NULL==pEmailInfo )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Invalid input param!");
+		return APP_PARAMERROR;
+	}
+	
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"iBccEmailNum[%d]!",pEmailInfo->mBccEmailGroup.iBccEmailNum);
+
+	iBccEmailNum = pEmailInfo->mBccEmailGroup.iBccEmailNum;
+	for(iI=0; iI<iBccEmailNum; iI++)
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"aucBccEmail[%s] of [%d/%d]!",pEmailInfo->mBccEmailGroup.mBccEmail[iI].aucToEmail,iI+1,iBccEmailNum);
+	}
+	
+	return APP_SUCCESS;
+}
+
+/***********************************************************************************************
+	FuncName : EmailApp_DispMail
+    FuncFunc : 显示邮件接收的邮件组信息
+	Input	 : EMAIL_PRM *		— pEmailInfo,输入邮件信息
+	Output	 : None
+	Return	 : unsigned char	— 成功,返回APP_SUCCESS
+								— 失败,返回APP_FAILURE
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+unsigned char EmailApp_DispMail(EMAIL_PRM *pEmailInfo)
+{
+	unsigned char ucRetCode = APP_SUCCESS;
+
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter EmailApp_DispMail!");
+
+	ucRetCode = EmailApp_DispFromMail(pEmailInfo);
+	if( ucRetCode )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_DispFromMail fail,ucRetCode[0x%02X]!",ucRetCode);
+		return ucRetCode;
+	}
+	
+	ucRetCode = EmailApp_DispToMail(pEmailInfo);
+	if( ucRetCode )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_DispToMail fail,ucRetCode[0x%02X]!",ucRetCode);
+		return ucRetCode;
+	}
+
+	ucRetCode = EmailApp_DispCcMail(pEmailInfo);
+	if( ucRetCode )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_DispCcMail fail,ucRetCode[0x%02X]!",ucRetCode);
+		return ucRetCode;
+	}
+
+	ucRetCode = EmailApp_DispBccMail(pEmailInfo);
+	if( ucRetCode )
+	{
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_DispBccMail fail,ucRetCode[0x%02X]!",ucRetCode);
+		return ucRetCode;
+	}
+	
 	return APP_SUCCESS;
 }
 
@@ -2208,34 +2298,37 @@ unsigned char EmailApp_SetHead(EMAIL_PRM *pEmailInfo,unsigned char *pucOutputDat
 	//发送
 	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_INFO,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"From!");
 
-	#if 0
-	/*注意:163发送qq邮箱时,qq邮箱会提示"此地址未验证，请注意识别",qq邮箱对于加密的发件人没做全部解密比较*/
-	uiBase64DataLen = sizeof(aucBase64Data);
-	memset(aucBase64Data,0,sizeof(aucBase64Data));
-	ucRetCode = EmailApp_GetBase64(pEmailInfo->ucHeadEncodeFlag,pEmailInfo->aucCharset,pEmailInfo->mFromEmail.aucFromEmail,strlen(pEmailInfo->mFromEmail.aucFromEmail),aucBase64Data,&uiBase64DataLen);
-	if( ucRetCode || !uiBase64DataLen )
+	if( memcmp(pEmailInfo->mFromEmail.aucServerHostName,"qq",2) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_GetBase64 aucFromEmail fail!");
-		return APP_PARAMERROR;
-	}
-	
-	if( pEmailInfo->ucHeadEncodeFlag )
-	{
-		memset(aucData,0,sizeof(aucData));
-		sprintf(aucData,"From: \"%s\"%s",aucBase64Data,EMAILAPP_EOF);
-		uiDataLen = strlen(aucData);
+		/*注意:163发送qq邮箱时,qq邮箱会提示"此地址未验证，请注意识别",qq邮箱对于加密的发件人没做全部解密比较*/
+		uiBase64DataLen = sizeof(aucBase64Data);
+		memset(aucBase64Data,0,sizeof(aucBase64Data));
+		ucRetCode = EmailApp_GetBase64(pEmailInfo->ucHeadEncodeFlag,pEmailInfo->aucCharset,pEmailInfo->mFromEmail.aucFromEmail,strlen(pEmailInfo->mFromEmail.aucFromEmail),aucBase64Data,&uiBase64DataLen);
+		if( ucRetCode || !uiBase64DataLen )
+		{
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"EmailApp_GetBase64 aucFromEmail fail!");
+			return APP_PARAMERROR;
+		}
+		
+		if( pEmailInfo->ucHeadEncodeFlag )
+		{
+			memset(aucData,0,sizeof(aucData));
+			sprintf(aucData,"From: \"%s\"%s",aucBase64Data,EMAILAPP_EOF);
+			uiDataLen = strlen(aucData);
+		}
+		else
+		{
+			memset(aucData,0,sizeof(aucData));
+			sprintf(aucData,"From: %s%s",aucBase64Data,EMAILAPP_EOF);
+			uiDataLen = strlen(aucData);
+		}
 	}
 	else
 	{
 		memset(aucData,0,sizeof(aucData));
-		sprintf(aucData,"From: %s%s",aucBase64Data,EMAILAPP_EOF);
+		sprintf(aucData,"From: %s%s",pEmailInfo->mFromEmail.aucFromEmail,EMAILAPP_EOF);
 		uiDataLen = strlen(aucData);
 	}
-	#else
-	memset(aucData,0,sizeof(aucData));
-	sprintf(aucData,"From: %s%s",pEmailInfo->mFromEmail.aucFromEmail,EMAILAPP_EOF);
-	uiDataLen = strlen(aucData);
-	#endif
 	
 	memset(aucSendBuf,0,sizeof(aucSendBuf));
 	strcpy(aucSendBuf,aucData);

@@ -43,8 +43,14 @@ extern "C" {
 /*邮件编码集最大长度*/
 #define		EMAILAPP_CHARSET_MAXLEN		16
 
+/*邮件地址最小长度*/
+#define		EMAILAPP_EMAILADDR_MINLEN	9
+
 /*邮件地址最大长度*/
-#define		EMAILAPP_EMAILADDR_MAXLEN	32
+#define		EMAILAPP_EMAILADDR_MAXLEN	64
+
+/*邮件用户名最小长度*/
+#define		EMAILAPP_USERNAME_MINLEN	3
 
 /*邮件用户名最大长度*/
 #define		EMAILAPP_USERNAME_MAXLEN	32
@@ -52,8 +58,11 @@ extern "C" {
 /*邮件用户密码最大长度*/
 #define		EMAILAPP_USERPASSWORD_MAXLEN	32
 
+/*邮件服务器主机域名最小长度*/
+#define		EMAILAPP_HOSTDOMAINNAME_MINLEN	5
+
 /*邮件服务器主机域名最大长度*/
-#define		EMAILAPP_HOSTDOMAINNAME_MAXLEN	32
+#define		EMAILAPP_HOSTDOMAINNAME_MAXLEN	16
 
 /*邮件服务器主机地址最大长度*/
 #define		EMAILAPP_HOSTIP_MAXLEN		15
