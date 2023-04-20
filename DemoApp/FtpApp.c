@@ -34,11 +34,11 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter JN_GetCommCfg!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter JN_GetCommCfg!");
 	
 	if( APP_SUCCESS!=Tool_IsExistFile(GLOBAL_DEFAULTCONFIGPATH,DEMOAPP_CONFIGFILENAME,0) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "JN_GetCommCfg APP_FAILURE!");
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "JN_GetCommCfg APP_FAILURE!");
 		return APP_FAILURE;
 	}
 	
@@ -75,7 +75,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 			g_mTermCfg.ucCommFlag = 1;
 		}
 
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CurrentCommMode[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CurrentCommMode[%s]!",aucKeyValue);
 	}
 
 	/*获取COMMPORT*/
@@ -124,7 +124,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 				g_mTermCfg.uiCommPort = COM9;
 			}
 
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "COMMPORT[%s]!",aucKeyValue);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "COMMPORT[%s]!",aucKeyValue);
 		}
 	}
 
@@ -137,7 +137,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	{
 		//if( COMM_TYPE_RS232==g_mTermCfg.ucCurrentCommMode )
 		{
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BAUDRATE[%s]!",aucKeyValue);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BAUDRATE[%s]!",aucKeyValue);
 			
 			switch( atol(aucKeyValue) )
 			{
@@ -169,7 +169,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	{
 		memset(g_mTermCfg.aucTCPIP1,0,sizeof(g_mTermCfg.aucTCPIP1));
 		memcpy(g_mTermCfg.aucTCPIP1,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP1[%s]!",aucKeyValue);
 	}
 
 	/*获取PORT1*/
@@ -177,10 +177,10 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","PORT1");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTCPHostPort1 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT1[%s]!",aucKeyValue);
 	}
 
 	/*获取IP2*/
@@ -192,7 +192,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	{
 		memset(g_mTermCfg.aucTCPIP2,0,sizeof(g_mTermCfg.aucTCPIP2));
 		memcpy(g_mTermCfg.aucTCPIP2,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP2[%s]!",aucKeyValue);
 	}
 	
 	/*获取PORT2*/
@@ -200,10 +200,10 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","PORT2");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTCPHostPort2 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT2[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https通讯时是否支持库的协议0-不支持 1-支持*/
@@ -214,7 +214,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x04;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPLIBFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPLIBFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https通讯时URL是否自解析0-不支持 1-支持*/
@@ -225,7 +225,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x01;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https是否支持URL自解析失败后尝试Host IP/Name 0-不支持 1-支持*/
@@ -236,7 +236,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x02;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLCOMMFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLCOMMFLAG[%s]!",aucKeyValue);
 	}
 
 	/*http或https接收的包是否不自解析:0-不解析 1-解析*/
@@ -247,7 +247,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x08;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOHTTPPARSEFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOHTTPPARSEFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https通讯时请求方法:0-POST方法 1-GET方法*/
@@ -258,7 +258,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucRequestWayFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPWAYFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPWAYFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https的URL*/
@@ -269,7 +269,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=256) ) )
 	{
 		strcpy(g_mTermCfg.aucHttpURL,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "URL[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "URL[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https的DOMAIN*/
@@ -280,7 +280,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucHttpDomain,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DOMAIN[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DOMAIN[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https的PAGE*/
@@ -291,7 +291,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucHttpPage,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PAGE[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PAGE[%s]!",aucKeyValue);
 	}
 
 	/*获取HOSTNAME1*/
@@ -302,7 +302,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucTCPDomainName1,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME1[%s]!",aucKeyValue);
 	}
 
 	/*获取HOSTNAME2*/
@@ -313,7 +313,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue)) )
 	{
 		strcpy(g_mTermCfg.aucTCPDomainName2,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME2[%s]!",aucKeyValue);
 	}
 
 	/*获取BakCommFlag*/
@@ -324,7 +324,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucBakCommFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BakCommFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BakCommFlag[%s]!",aucKeyValue);
 	}
 
 	/*获取HOSTNAMEFLAG*/
@@ -334,7 +334,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);	
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DomainNameFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DomainNameFlag[%s]!",aucKeyValue);
 		g_mTermCfg.ucDomainNameFlag = atoi((char *)aucKeyValue);
 	}
 	else
@@ -347,10 +347,10 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","RS232TIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usRS232Timeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "RS232Timeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "RS232Timeout[%s]!",aucKeyValue);
 	}
 
 	/*获取TcpTimeout*/
@@ -358,10 +358,10 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","TCPTIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTcpTimeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TcpTimeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TcpTimeout[%s]!",aucKeyValue);
 	}
 
 	/*获取SSLFLAG*/
@@ -371,7 +371,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);	
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLFlag[%s]!",aucKeyValue);
 		g_mTermCfg.ucSSLFlag = atoi((char *)aucKeyValue);
 	}
 	else
@@ -384,10 +384,10 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","SSLTIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usSSLTimeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLTimeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLTimeout[%s]!",aucKeyValue);
 	}
 
 	/*服务器设定的IP*/
@@ -398,7 +398,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckValidIp(aucKeyValue)) )
 	{
 		strcpy(g_mTermCfg.aucTCPServerIP1,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerIP[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerIP[%s]!",aucKeyValue);
 	}
 
 	/*服务器监听PORT1*/
@@ -406,10 +406,10 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","TCPServerPort");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTCPServerPort1 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerPort[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerPort[%s]!",aucKeyValue);
 	}
 
 	/*TCP服务器阻塞时超时时间(S)*/
@@ -417,10 +417,10 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","TCPServerBlockTimeout");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTcpServerBlockTimeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerBlockTimeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerBlockTimeout[%s]!",aucKeyValue);
 	}
 
 	/*获取FTP IP1*/
@@ -432,7 +432,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	{
 		memset(g_mTermCfg.aucFTPServerIP1,0,sizeof(g_mTermCfg.aucFTPServerIP1));
 		memcpy(g_mTermCfg.aucFTPServerIP1,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP IP1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP IP1[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -444,10 +444,10 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","FTPPORT1");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usFTPServerPort1 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP PORT1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP PORT1[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -463,7 +463,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	{
 		memset(g_mTermCfg.aucFTPServerIP2,0,sizeof(g_mTermCfg.aucFTPServerIP2));
 		memcpy(g_mTermCfg.aucFTPServerIP2,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP IP2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP IP2[%s]!",aucKeyValue);
 	}
 	
 	/*获取FTP PORT2*/
@@ -471,10 +471,10 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","FTPPORT2");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usFTPServerPort2 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP PORT2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP PORT2[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -489,7 +489,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucFTPHostName1,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP HOSTNAME1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP HOSTNAME1[%s]!",aucKeyValue);
 	}
 
 	/*获取FTP HOSTNAME2*/
@@ -500,7 +500,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue)) )
 	{
 		strcpy(g_mTermCfg.aucFTPHostName2,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP HOSTNAME2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP HOSTNAME2[%s]!",aucKeyValue);
 	}
 
 	/*获取FTP BakCommFlag*/
@@ -511,7 +511,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucFTPSockBakFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP BakCommFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP BakCommFlag[%s]!",aucKeyValue);
 	}
 
 	/*获取FTP HOSTNAMEFLAG*/
@@ -521,7 +521,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);	
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP DomainNameFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP DomainNameFlag[%s]!",aucKeyValue);
 		g_mTermCfg.ucFTPHostNameFlag = atoi((char *)aucKeyValue);
 	}
 	else
@@ -537,7 +537,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucFTPUserName,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP User[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP User[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -552,7 +552,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucFTPUserPassword,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Password[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Password[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -568,7 +568,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	{
 		memset(g_mTermCfg.aucFTPLocalIP,0,sizeof(g_mTermCfg.aucFTPLocalIP));
 		memcpy(g_mTermCfg.aucFTPLocalIP,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Local IP[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Local IP[%s]!",aucKeyValue);
 	}
 	
 	/*获取FtpTimeout*/
@@ -576,10 +576,10 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","FTPTIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usFTPServerTimeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpTimeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpTimeout[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -594,7 +594,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=128) ) )
 	{
 		strcpy(g_mTermCfg.aucFTPLocalPath,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Local PATH[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Local PATH[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -611,7 +611,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=128) ) )
 	{
 		strcpy(g_mTermCfg.aucFTPRemotePath,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Remote PATH[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Remote PATH[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -627,7 +627,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && (('I'==aucKeyValue[0]) || ('A'==aucKeyValue[0]) || ('E'==aucKeyValue[0])))
 	{
 		g_mTermCfg.aucFTPFileType[0] = aucKeyValue[0];
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP File Type[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP File Type[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -642,7 +642,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && (('0'==aucKeyValue[0]) || ('1'==aucKeyValue[0]) ) )
 	{
 		g_mTermCfg.ucFTPFileNullFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP FileNullFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP FileNullFlag[%s]!",aucKeyValue);
 	}
 
 	/*FTP Upload tmp file flag*/ 
@@ -653,7 +653,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucFTPUploadTmpFileFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP UploadTmpFileFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP UploadTmpFileFlag[%s]!",aucKeyValue);
 	}
 
 	/*FTP Del Remote file flag*/
@@ -664,7 +664,7 @@ unsigned char FtpApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucFTPDelRemoteFileFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP DelRemoteFileFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP DelRemoteFileFlag[%s]!",aucKeyValue);
 	}
 	
 	return APP_SUCCESS;
@@ -687,19 +687,19 @@ unsigned char FtpApp_InitComm( void )
 {
 	unsigned char ucRetCode = 0;
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter FtpApp_InitComm");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter FtpApp_InitComm");
 	
 	AppUtils_DisplayLeft("通讯初始化...\n", LINE2);
 	AppUtils_DisplayLeft("请稍候...\n", LINE3);
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Comm_InitComm!");
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CommPort[COM%d],BaudRate[%d]!",g_mTermCfg.uiCommPort,g_mTermCfg.uiBaudRate);
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Comm_InitComm!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CommPort[COM%d],BaudRate[%d]!",g_mTermCfg.uiCommPort,g_mTermCfg.uiBaudRate);
 	
 	ucRetCode = Comm_InitComm(g_mTermCfg.uiCommPort,g_mTermCfg.uiBaudRate,g_mTermCfg.usRS232Timeout);	
 	if( APP_SUCCESS==ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Comm_InitSock!");
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BakCommFlag[%d],TCPIP1[%s],TCPHostPort1[%d],TCPIP2[%s],TCPHostPort2[%d],SelfHttpProtocolFlag[%d],HttpURL[%s],HttpRequestWayFlag[%d],TCPServerIP[%s],TCPServerPort[%d],TcpServerBlockTimeout[%d]!",
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Comm_InitSock!");
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BakCommFlag[%d],TCPIP1[%s],TCPHostPort1[%d],TCPIP2[%s],TCPHostPort2[%d],SelfHttpProtocolFlag[%d],HttpURL[%s],HttpRequestWayFlag[%d],TCPServerIP[%s],TCPServerPort[%d],TcpServerBlockTimeout[%d]!",
 							g_mTermCfg.ucBakCommFlag,g_mTermCfg.aucTCPIP1,g_mTermCfg.usTCPHostPort1,
 							g_mTermCfg.aucTCPIP2,g_mTermCfg.usTCPHostPort2,g_mTermCfg.ucSelfProtocolFlag,g_mTermCfg.aucHttpURL,g_mTermCfg.ucRequestWayFlag,g_mTermCfg.aucTCPServerIP1,g_mTermCfg.usTCPServerPort1,g_mTermCfg.usTcpServerBlockTimeout);
 
@@ -713,7 +713,7 @@ unsigned char FtpApp_InitComm( void )
 
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_InitComm fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_InitComm fail,ucRetCode[0x%02X]!",ucRetCode);
 	}
 	
 	return ucRetCode;
@@ -767,7 +767,7 @@ unsigned char FtpApp_Init(void *pDummy)
 {
 	unsigned char ucRetCode = APP_SUCCESS;
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,3,DEBUG, "Enter FtpApp_Init!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,3,DEBUG, "Enter FtpApp_Init!");
 
 	ucRetCode = FtpApp_GetCfg(pDummy);
 
@@ -776,7 +776,7 @@ unsigned char FtpApp_Init(void *pDummy)
 		ucRetCode = FtpApp_InitComm();
 		if( ucRetCode )
 		{
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_InitComm fail,ucRetCode[0x%02X]!",ucRetCode);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_InitComm fail,ucRetCode[0x%02X]!",ucRetCode);
 			return ucRetCode;
 		}
 	}
@@ -803,7 +803,7 @@ unsigned char FtpApp_DownloadFile(void *pDummy)
 	unsigned char aucTmpBuf[APP_MAXCOMMBUF+1];
 	unsigned char aucFileName[256+1];
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter FtpApp_DownloadFile!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter FtpApp_DownloadFile!");
 	
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_FTP_DOWNLOADFILE;
@@ -816,7 +816,7 @@ unsigned char FtpApp_DownloadFile(void *pDummy)
 	ucRetCode = AppUtils_GetCn(LINE2,"请输入文件名:",aucTmpBuf,1,32,60);
 	if( (APP_SUCCESS!=ucRetCode) || (!strlen(aucTmpBuf)) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"AppUtils_GetCn fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"AppUtils_GetCn fail,ucRetCode[0x%02X]!",ucRetCode);
 		AppUtils_FormatDisp("获取文件名失败,ucRetCode[%d]\n",ucRetCode);
 		AppUtils_WaitKey(5);
 		return ucRetCode;
@@ -825,7 +825,7 @@ unsigned char FtpApp_DownloadFile(void *pDummy)
 	ucRetCode = FtpApp_Init((void*)pDummy);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_Init fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_Init fail,ucRetCode[0x%02X]!",ucRetCode);
 		return ucRetCode;
 	}
 
@@ -838,7 +838,7 @@ unsigned char FtpApp_DownloadFile(void *pDummy)
 	ucRetCode = Comm_FtpDownloadFile(g_mTermCfg.aucFTPLocalPath,aucFileName,g_mTermCfg.aucFTPRemotePath,aucFileName,g_mTermCfg.aucFTPFileType,g_mTermCfg.ucFTPFileNullFlag,g_mTermCfg.ucFTPDelRemoteFileFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpDownloadFile fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpDownloadFile fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
 		memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 		Comm_GetDescpFromCode(ucRetCode, aucTmpBuf);
 		AppUtils_FormatDisp("下载Ftp文件失败,ucRetCode[%d:%s],aucFileName[%s]\n",ucRetCode,aucTmpBuf,aucFileName);
@@ -849,7 +849,7 @@ unsigned char FtpApp_DownloadFile(void *pDummy)
 	ucRetCode = Comm_FtpDownloadFileEx(g_mTermCfg.aucFTPServerIP1,g_mTermCfg.usFTPServerPort1,g_mTermCfg.aucFTPUserName,g_mTermCfg.aucFTPUserPassword,g_mTermCfg.aucFTPLocalPath,aucFileName,g_mTermCfg.aucFTPRemotePath,aucFileName,g_mTermCfg.aucFTPFileType,g_mTermCfg.ucFTPFileNullFlag,g_mTermCfg.ucFTPDelRemoteFileFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpDownloadFileEx fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpDownloadFileEx fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
 		memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 		Comm_GetDescpFromCode(ucRetCode, aucTmpBuf);
 		AppUtils_FormatDisp("下载Ftp文件失败,ucRetCode[%d:%s],aucFileName[%s]\n",ucRetCode,aucTmpBuf,aucFileName);
@@ -887,7 +887,7 @@ unsigned char FtpApp_DownloadFiles(void *pDummy)
     unsigned char aucFileList[1024] = {0};    
 	unsigned char *pucPtr = NULL;
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter FtpApp_DownloadFiles!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter FtpApp_DownloadFiles!");
 	
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_FTP_DOWNLOADFILE;
@@ -898,7 +898,7 @@ unsigned char FtpApp_DownloadFiles(void *pDummy)
 	ucRetCode = FtpApp_Init((void*)pDummy);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_Init fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_Init fail,ucRetCode[0x%02X]!",ucRetCode);
 		return ucRetCode;
 	}
 
@@ -912,7 +912,7 @@ unsigned char FtpApp_DownloadFiles(void *pDummy)
 	ucRetCode = Comm_FtpGetFileList(g_mTermCfg.aucFTPUserName,g_mTermCfg.aucFTPUserPassword,g_mTermCfg.aucFTPRemotePath,g_mTermCfg.ucFTPListType,aucReplyBuf);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpGetFileList fail,ucRetCode[%d],aucFTPRemotePath[%s]!",ucRetCode,g_mTermCfg.aucFTPRemotePath);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpGetFileList fail,ucRetCode[%d],aucFTPRemotePath[%s]!",ucRetCode,g_mTermCfg.aucFTPRemotePath);
 		memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 		Comm_GetDescpFromCode(ucRetCode, aucTmpBuf);
 		AppUtils_FormatDisp("下载Ftp远程目录文件列表失败,ucRetCode[%d:%s]\n",ucRetCode,aucTmpBuf);
@@ -923,7 +923,7 @@ unsigned char FtpApp_DownloadFiles(void *pDummy)
 	ucRetCode = Comm_FtpGetFileListEx(g_mTermCfg.aucFTPServerIP1,g_mTermCfg.usFTPServerPort1,g_mTermCfg.aucFTPUserName,g_mTermCfg.aucFTPUserPassword,g_mTermCfg.aucFTPRemotePath,g_mTermCfg.ucFTPListType,aucReplyBuf);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpGetFileListEx fail,ucRetCode[%d],aucFTPRemotePath[%s]!",ucRetCode,g_mTermCfg.aucFTPRemotePath);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpGetFileListEx fail,ucRetCode[%d],aucFTPRemotePath[%s]!",ucRetCode,g_mTermCfg.aucFTPRemotePath);
 		memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 		Comm_GetDescpFromCode(ucRetCode, aucTmpBuf);
 		AppUtils_FormatDisp("下载Ftp远程目录文件列表失败,ucRetCode[%d:%s]\n",ucRetCode,aucTmpBuf);
@@ -952,7 +952,7 @@ unsigned char FtpApp_DownloadFiles(void *pDummy)
 	    ucRetCode = Comm_FtpParseList(aucReplyBuf,g_mTermCfg.ucFTPListType,aucFileList);
 		if( ucRetCode )
 		{
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpParseList fail,ucRetCode[%d]!",ucRetCode);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpParseList fail,ucRetCode[%d]!",ucRetCode);
 			memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 			Comm_GetDescpFromCode(ucRetCode, aucTmpBuf);
 			AppUtils_FormatDisp("下载Ftp远程目录文件列表失败,ucRetCode[%d:%s]\n",ucRetCode,aucTmpBuf);
@@ -961,10 +961,10 @@ unsigned char FtpApp_DownloadFiles(void *pDummy)
 		}
 	}
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "aucFileList[%s]!",aucFileList);
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "aucFileList[%s]!",aucFileList);
 	
     Tool_StrTrimAll(aucFileList);
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_StrTrimAll aucFileList[%s]!",aucFileList);
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_StrTrimAll aucFileList[%s]!",aucFileList);
     pucPtr = aucFileList;
     uiI = 0;
 	memset(aucFileName,0,sizeof(aucFileName));
@@ -974,7 +974,7 @@ unsigned char FtpApp_DownloadFiles(void *pDummy)
         {
             Tool_StrTrimAll(aucFileName);
 			//AppUtils_FormatDisp("下载Ftp文件[%s]!",aucFileName);
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Org aucFileName[%s]!",aucFileName);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Org aucFileName[%s]!",aucFileName);
 
 			/*中文文件名乱码*/
 			memset(aucTmpBuf,0,sizeof(aucTmpBuf));
@@ -984,13 +984,13 @@ unsigned char FtpApp_DownloadFiles(void *pDummy)
 
 			AppUtils_FormatDisp("下载Ftp文件[%s]!",aucFileName);
 			
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "aucFileName[%s]!",aucFileName);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "aucFileName[%s]!",aucFileName);
 
             /*检查文件名是否重复*/
 			ucRetCode = Tool_IsExistFile(g_mTermCfg.aucFTPLocalPath,aucFileName,1);
 			if( !ucRetCode )
 			{
-				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_IsExistFile,ucRetCode[0x%02X],aucFileName[%s]!",ucRetCode,aucFileName);
+				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_IsExistFile,ucRetCode[0x%02X],aucFileName[%s]!",ucRetCode,aucFileName);
 				AppUtils_FormatDisp("文件[%s]已经存在!",aucFileName);
 				uiI = 0;
 		        pucPtr++;
@@ -1002,7 +1002,7 @@ unsigned char FtpApp_DownloadFiles(void *pDummy)
 			ucRetCode = Comm_FtpDownloadFile(g_mTermCfg.aucFTPLocalPath,aucFileName,g_mTermCfg.aucFTPRemotePath,aucFileName,g_mTermCfg.aucFTPFileType,g_mTermCfg.ucFTPFileNullFlag,g_mTermCfg.ucFTPDelRemoteFileFlag);
 			if( ucRetCode )
 			{
-				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpDownloadFile fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
+				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpDownloadFile fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
 				memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 				Comm_GetDescpFromCode(ucRetCode, aucTmpBuf);
 				AppUtils_FormatDisp("下载Ftp文件失败,ucRetCode[%d:%s],aucFileName[%s]\n",ucRetCode,aucTmpBuf,aucFileName);
@@ -1013,7 +1013,7 @@ unsigned char FtpApp_DownloadFiles(void *pDummy)
 			ucRetCode = Comm_FtpDownloadFileEx(g_mTermCfg.aucFTPServerIP1,g_mTermCfg.usFTPServerPort1,g_mTermCfg.aucFTPUserName,g_mTermCfg.aucFTPUserPassword,g_mTermCfg.aucFTPLocalPath,aucFileName,g_mTermCfg.aucFTPRemotePath,aucFileName,g_mTermCfg.aucFTPFileType,g_mTermCfg.ucFTPFileNullFlag,g_mTermCfg.ucFTPDelRemoteFileFlag);
 			if( ucRetCode )
 			{
-				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpDownloadFileEx fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
+				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpDownloadFileEx fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
 				memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 				Comm_GetDescpFromCode(ucRetCode, aucTmpBuf);
 				AppUtils_FormatDisp("下载Ftp文件失败,ucRetCode[%d:%s],aucFileName[%s]\n",ucRetCode,aucTmpBuf,aucFileName);
@@ -1070,7 +1070,7 @@ unsigned char FtpApp_UploadFile(void *pDummy)
 	unsigned char aucTmpBuf[APP_MAXCOMMBUF+1];
 	unsigned char aucFileName[256+1];
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter FtpApp_UploadFile!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter FtpApp_UploadFile!");
 	
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_FTP_UPLOADFILE;
@@ -1083,7 +1083,7 @@ unsigned char FtpApp_UploadFile(void *pDummy)
 	ucRetCode = AppUtils_GetCn(LINE2,"请输入文件名:",aucTmpBuf,1,32,60);
 	if( (APP_SUCCESS!=ucRetCode) || (!strlen(aucTmpBuf)) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"AppUtils_GetText fail,ucRetCode[%d]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"AppUtils_GetText fail,ucRetCode[%d]!",ucRetCode);
 		AppUtils_FormatDisp("获取文件名失败,ucRetCode[%d]\n",ucRetCode);
 		AppUtils_WaitKey(5);
 		return ucRetCode;
@@ -1092,7 +1092,7 @@ unsigned char FtpApp_UploadFile(void *pDummy)
 	ucRetCode = FtpApp_Init((void*)pDummy);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_Init fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_Init fail,ucRetCode[0x%02X]!",ucRetCode);
 		return ucRetCode;
 	}
 
@@ -1106,7 +1106,7 @@ unsigned char FtpApp_UploadFile(void *pDummy)
 	ucRetCode = Tool_IsExistFile(g_mTermCfg.aucFTPLocalPath,aucFileName, g_mTermCfg.ucFTPFileNullFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Tool_IsExistFile fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Tool_IsExistFile fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
 		memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 		Tool_GetDescpFromCode(ucRetCode, aucTmpBuf);
 		AppUtils_FormatDisp("上传Ftp文件失败,ucRetCode[%d:%s],aucFileName[%s]\n",ucRetCode,aucTmpBuf,aucFileName);
@@ -1119,7 +1119,7 @@ unsigned char FtpApp_UploadFile(void *pDummy)
 	ucRetCode = Comm_FtpUploadFile(g_mTermCfg.aucFTPLocalPath,aucFileName,g_mTermCfg.aucFTPRemotePath,aucFileName,g_mTermCfg.aucFTPFileType,g_mTermCfg.ucFTPFileNullFlag,g_mTermCfg.ucFTPUploadTmpFileFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpUploadFile fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpUploadFile fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
 		memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 		Comm_GetDescpFromCode(ucRetCode, aucTmpBuf);
 		AppUtils_FormatDisp("上传Ftp文件失败,ucRetCode[%d:%s]\n",ucRetCode,aucTmpBuf);
@@ -1130,7 +1130,7 @@ unsigned char FtpApp_UploadFile(void *pDummy)
 	ucRetCode = Comm_FtpUploadFileEx(g_mTermCfg.aucFTPServerIP1,g_mTermCfg.usFTPServerPort1,g_mTermCfg.aucFTPUserName,g_mTermCfg.aucFTPUserPassword,g_mTermCfg.aucFTPLocalPath,aucFileName,g_mTermCfg.aucFTPRemotePath,aucFileName,g_mTermCfg.aucFTPFileType,g_mTermCfg.ucFTPFileNullFlag,g_mTermCfg.ucFTPUploadTmpFileFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpUploadFileEx fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpUploadFileEx fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
 		memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 		Comm_GetDescpFromCode(ucRetCode,aucTmpBuf);
 		AppUtils_FormatDisp("上传Ftp文件失败,ucRetCode[%d:%s]\n",ucRetCode,aucTmpBuf);
@@ -1169,7 +1169,7 @@ unsigned char FtpApp_UploadFiles(void *pDummy)
     unsigned char aucFileList[1024] = {0};    
 	unsigned char *pucPtr = NULL;
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter FtpApp_UploadFiles!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter FtpApp_UploadFiles!");
 	
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_FTP_UPLOADFILE;
@@ -1180,7 +1180,7 @@ unsigned char FtpApp_UploadFiles(void *pDummy)
 	ucRetCode = FtpApp_Init((void*)pDummy);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_Init fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpApp_Init fail,ucRetCode[0x%02X]!",ucRetCode);
 		return ucRetCode;
 	}
 
@@ -1191,13 +1191,13 @@ unsigned char FtpApp_UploadFiles(void *pDummy)
     ucRetCode = Tool_GetFileListToBuf(g_mTermCfg.aucFTPLocalPath,aucFileList);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_GetFileListToBuf fail,[ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_GetFileListToBuf fail,[ucRetCode=0x%02X]!",ucRetCode);
 		return ucRetCode;
 	}
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "aucFileList[%s]!",aucFileList);
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "aucFileList[%s]!",aucFileList);
 	
     Tool_StrTrimAll(aucFileList);
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_StrTrimAll aucFileList[%s]!",aucFileList);
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_StrTrimAll aucFileList[%s]!",aucFileList);
     pucPtr = aucFileList;
     uiI = 0;
 	memset(aucFileName,0,sizeof(aucFileName));
@@ -1207,7 +1207,7 @@ unsigned char FtpApp_UploadFiles(void *pDummy)
         {
             Tool_StrTrimAll(aucFileName);
 			AppUtils_FormatDisp("上传Ftp文件[%s]!",aucFileName);
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "aucFileName[%s]!",aucFileName);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "aucFileName[%s]!",aucFileName);
 
             /*检查文件名是否存在*/
 			ucRetCode = Tool_IsExistFile(g_mTermCfg.aucFTPLocalPath,aucFileName,g_mTermCfg.ucFTPFileNullFlag);
@@ -1216,7 +1216,7 @@ unsigned char FtpApp_UploadFiles(void *pDummy)
 				uiI = 0;
 		        pucPtr++;
 				memset(aucFileName,0,sizeof(aucFileName));
-				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_IsExistFile fail,ucRetCode[0x%02X],aucFileName[%s]!",ucRetCode,aucFileName);
+				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Tool_IsExistFile fail,ucRetCode[0x%02X],aucFileName[%s]!",ucRetCode,aucFileName);
 				AppUtils_FormatDisp("文件[%s]不存在!",aucFileName);
 				continue;
 			}
@@ -1225,7 +1225,7 @@ unsigned char FtpApp_UploadFiles(void *pDummy)
 			ucRetCode = Comm_FtpUploadFile(g_mTermCfg.aucFTPLocalPath,aucFileName,g_mTermCfg.aucFTPRemotePath,aucFileName,g_mTermCfg.aucFTPFileType,g_mTermCfg.ucFTPFileNullFlag,g_mTermCfg.ucFTPUploadTmpFileFlag);
 			if( ucRetCode )
 			{
-				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpUploadFile fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
+				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpUploadFile fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
 				memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 				Comm_GetDescpFromCode(ucRetCode, aucTmpBuf);
 				AppUtils_FormatDisp("上传Ftp文件失败,ucRetCode[%d:%s]\n",ucRetCode,aucTmpBuf);
@@ -1236,7 +1236,7 @@ unsigned char FtpApp_UploadFiles(void *pDummy)
 			ucRetCode = Comm_FtpUploadFileEx(g_mTermCfg.aucFTPServerIP1,g_mTermCfg.usFTPServerPort1,g_mTermCfg.aucFTPUserName,g_mTermCfg.aucFTPUserPassword,g_mTermCfg.aucFTPLocalPath,aucFileName,g_mTermCfg.aucFTPRemotePath,aucFileName,g_mTermCfg.aucFTPFileType,,g_mTermCfg.ucFTPFileNullFlag,g_mTermCfg.ucFTPUploadTmpFileFlag);
 			if( ucRetCode )
 			{
-				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpUploadFileEx fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
+				Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_FtpUploadFileEx fail,ucRetCode[%d],aucFileName[%s]!",ucRetCode,aucFileName);
 				memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 				Comm_GetDescpFromCode(ucRetCode, aucTmpBuf);
 				AppUtils_FormatDisp("上传Ftp文件失败,ucRetCode[%d:%s]\n",ucRetCode,aucTmpBuf);
@@ -1352,7 +1352,7 @@ unsigned char FtpApp_Menu(void *pDummy)
 	
 	ucMenuOption = MENUOPT_INORDER | MENUOPT_EXEC_FUNC | MENUOPT_UP_DOWN_ARROW;
 	
-	return AppUtils_DisplayMenu(LINE1, aucDispTitleBuf, ucMenuOption, sizeof(aucMenuItem) / sizeof(AppUtils_MenuItem), aucMenuItem, 60);
+	return AppUtils_DisplayMenu(LINE1, aucDispTitleBuf, ucMenuOption, sizeof(aucMenuItem) / sizeof(AppUtils_MenuItem), aucMenuItem, 60, NULL);
 }
 
 

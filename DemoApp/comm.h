@@ -685,6 +685,21 @@ EXPORT unsigned char Comm_FtpUploadFileEx(unsigned char *pucFtpServerIp,int iFtp
             unsigned char *pucRemotePath,unsigned char *pucRemoteFileName,unsigned char *pucFileType,unsigned char ucSupportFileNullFlag,int iUploadTmpFileFlag);
 
 /***********************************************************************************************
+	FuncName : Comm_DispDescpFromCode
+	FuncFunc : 通过通讯返回码展示相关信息描述
+	Input	 : unsigned char	— ucRetCode 	,输入通讯的返回码
+	Output	 : None
+	Return	 : unsigned char *	— 成功,返回对应描述信息
+					 			— 失败,返回NULL
+	Author	 : Sunrier
+	Date     : 2011-03-21 19:00:55
+	Descp    : 获取通讯库返回码相关信息描述
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char *Comm_DispDescpFromCode(unsigned char ucRetCode);
+
+/***********************************************************************************************
 	FuncName : Comm_GetDescpFromCode
 	FuncFunc : 通过通讯返回码获取相关信息描述
 	Input	 : unsigned char	— ucRetCode 	,输入通讯的返回码
@@ -699,19 +714,37 @@ EXPORT unsigned char Comm_FtpUploadFileEx(unsigned char *pucFtpServerIp,int iFtp
 *************************************************************************************************/
 EXPORT unsigned char Comm_GetDescpFromCode(unsigned char ucRetCode,unsigned char *pucOutputData);
 
-/*********************************************************************************************** 
-    FuncName : Comm_GetLibVersion
-	FuncFunc : 获取通讯库版本信息
-	Input	 : None
-	Output	 : unsigned char *   — pucOutputData	Lib库版本号信息
-	Return	 : unsigned char	 — 成功,返回0x00
-								 — 失败,返回非0
-	Author   : Sunrier    
-	Date     : 2013-12-18 19:37:43
+/***********************************************************************************************
+	FuncName : Comm_GetRevisionInfo
+	FuncFunc : 获取库版本修订信息
+	Input	 : unsigned int *	— puiOutputDataLen	输入修订信息的最大存储长度
+	Output	 : unsigned char *	— pucOutputData	输出修订信息
+	           unsigned int *	— puiOutputDataLen	输出修订信息的长度
+	Return	 : unsigned	char 	— 成功,返回COMM_SUCCESS(0x00)
+								— 失败,返回非COMM_SUCCESS(0x01)
+	Author	 : Sunrier
+	Date     : 2012-06-05 19:00:55
 	Descp    : None
-	History  : None 
+	History  : None
+	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Comm_GetLibVersion(unsigned char *pucOutputData);
+EXPORT unsigned char Comm_GetRevisionInfo(unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
+	
+/***********************************************************************************************
+	FuncName : Comm_GetLibVersion
+	FuncFunc : 获取通讯库版本信息
+	Input	 : unsigned int *	— puiOutputDataLen	输入库版本的最大存储长度
+	Output	 : unsigned char *	— pucOutputData	输出当前库版本
+	           unsigned int *	— puiOutputDataLen	输出库版本的最大存储长度
+	Return	 : unsigned	char 	— 成功,返回COMM_SUCCESS(0x00)
+								— 失败,返回非COMM_SUCCESS(0x01)
+	Author	 : Sunrier
+	Date     : 2012-06-05 19:00:55
+	Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Comm_GetLibVersion(unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
 
 #endif
 

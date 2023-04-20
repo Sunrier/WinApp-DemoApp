@@ -93,6 +93,21 @@ unsigned char App_GetCommCfg( void );
 unsigned char App_Init( void );
 
 /***********************************************************************************************
+	FuncName : App_AddSystemNo
+    FuncFunc : 应用流水号自增
+	Input	 : None
+	Output	 : None
+	Return	 : unsigned char	— 成功,返回APP_SUCCESS
+								— 失败,返回APP_FAILURE
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+unsigned char App_AddSystemNo( void );
+
+/***********************************************************************************************
 	FuncName : App_Help
     FuncFunc : 软件帮助菜单
 	Input	 : None

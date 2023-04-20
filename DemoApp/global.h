@@ -31,7 +31,7 @@ extern "C" {
 #define APP_TIMER_SEC					(60*1)	/*定时超时时间 1分钟*/
 #define APP_WAITTIME					(60*1)	/*定时等待用户按键超时时间 1分钟*/
 
-#define APP_MAXCOMMBUF           		(4096*2)
+#define APP_MAXCOMMBUF           		(4096*3)
 
 #define GLOBAL_DEFAULTCONFIGPATH		".\\CONFIG\\"				/*配置文件默认路径*/
 #define GLOBAL_CONFIGFILENAME			GLOBAL_APPNAME ".ini"		/*应用配置文件名*/
@@ -51,19 +51,6 @@ extern "C" {
 #define APP_CONTACT						"Sunrier@163.com"
 #define APP_DATE						"2013-06-08 10:26:10"
 #define APP_DESCPTION					"实用软件"
-
-
-/*日志级别-LOG_OFF>LOG_ERROR>LOG_WARN>LOG_INFO>LOG_DEBUG>LOG_ALL*/
-typedef enum _LOG_LEVEL
-{
-	LOG_OFF  	= 0x00,	/*关闭所有日志记录-最高级别*/
-	LOG_ERROR	= 0x01,	/*描述应用程序运行中发生的错误信息*/
-	LOG_WARN	= 0x02,	/*描述应用程序运行中发生的警告信息*/
-	LOG_INFO 	= 0x03,	/*描述应用程序运行过程*/
-	LOG_DEBUG 	= 0x04,	/*打开调试日志*/
-	LOG_ALL 	= 0x05, /*打开所有日志记录*/
-	LOG_MAX,
-}LOG_LEVEL;
 
 
 /*App应用结构定义*/
@@ -89,6 +76,7 @@ typedef struct {
 	unsigned char aucDefTmpPath[512+1];		/*自定义默认临时目录*/
 	unsigned char aucDefTmpFile[512+1];		/*自定义默认临时文件*/
 	unsigned char ucAppFlag;				/*应用标志*/
+	unsigned long ulSystemNo;				/*应用流水号*/
 }App_Prm;
 
 typedef struct {

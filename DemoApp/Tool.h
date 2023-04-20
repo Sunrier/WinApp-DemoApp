@@ -25,6 +25,58 @@ extern "C" {
 #define EXPORT
 #endif
 
+#if !defined(__32BIT__) && !defined(__64BIT__)  
+#if defined(_LP64) || defined(__64BIT__) || defined(__LP64__) || defined(__x86_64__) || defined(_WIN64)
+    //typedef int bool;
+    typedef unsigned char uint8_t;
+    typedef unsigned int uint16_t;
+    typedef short int           INT16;
+    typedef unsigned short int  UINT16;
+    typedef int                 INT32;
+	typedef unsigned int        uint32_t;
+    typedef unsigned int        UINT32;
+    typedef long                INT64;
+    typedef unsigned long       UINT64;
+   /*  64位统一定义为 __64BIT__ */
+   #ifndef __64BIT__
+      #define __64BIT__
+   #endif
+#else
+    //typedef int bool;
+    typedef unsigned char uint8_t;
+    typedef unsigned int uint16_t;
+    typedef short int           INT16;
+    typedef unsigned short int  UINT16;
+#ifdef _MSC_VER
+#if _MSC_VER<=1200
+	//typedef long                INT32;
+	typedef unsigned long        uint32_t;
+    //typedef unsigned long        UINT32;
+//vc6使用的编译器是C90标准的，long long 型是在C99中新加入的。因此想要使用int 64 位的需要使用__int64变量即可
+	typedef __int64            INT64;
+    typedef unsigned __int64   UINT64;
+#else
+	typedef long                INT32;
+	typedef unsigned long        uint32_t;
+    typedef unsigned long        UINT32;
+	typedef long long            INT64;
+    typedef unsigned long long   UINT64;
+#endif
+#else
+	typedef long                INT32;
+	typedef unsigned long        uint32_t;
+    typedef unsigned long        UINT32;
+	typedef long long            INT64;
+    typedef unsigned long long   UINT64;
+#endif
+    #ifndef __32BIT__
+      #define __32BIT__
+   #endif
+#endif
+#endif
+
+#define TOOL_OFFSETOF(TYPE, MEMBER)   ((size_t) &((TYPE *)0)->MEMBER)
+
 #define DB_KEY_SIZE			sizeof(DBKEY)
 #define DB_MAX_RECD_LEN		20480
 #define DB_MAX_LOG_LEN		2048
@@ -71,10 +123,34 @@ typedef enum
 	bF2 = 0x70,
 }UserKey;
 
+/*日志级别-LOG_OFF>LOG_ERR>LOG_WARN>LOG_INFO>LOG_DEBUG>LOG_ALL*/
+typedef enum _LOG_LEVEL
+{
+	LOG_OFF  	= 0x00,	/*关闭所有日志记录-最高级别*/
+	LOG_ERROR	= 0x01,	/*描述应用程序运行中发生的错误信息*/
+	LOG_WARN	= 0x02,	/*描述应用程序运行中发生的警告信息*/
+	LOG_INFO 	= 0x04,	/*描述应用程序运行过程*/
+	LOG_DEBUG 	= 0x08,	/*打开调试日志*/
+	LOG_ALL 	= 0x10, /*打开所有日志记录*/
+	LOG_MAX,
+}LOG_LEVEL;
+
+/*检查日志级别-LOG_CHECK_OFF>LOG_CHECK_ERROR>LOG_CHECK_WARN>LOG_CHECK_INFO>LOG_CHECK_DEBUG>LOG_CHECK_ALL*/
+typedef enum _LOG_CHECK_LEVEL
+{
+	LOG_CHECK_OFF  	= 0x00,	/*关闭所有日志记录-最高级别*/
+	LOG_CHECK_ERROR	= 0x01,	/*描述应用程序运行中发生的错误信息*/
+	LOG_CHECK_WARN	= 0x02,	/*描述应用程序运行中发生的警告信息*/
+	LOG_CHECK_INFO 	= 0x03,	/*描述应用程序运行过程*/
+	LOG_CHECK_DEBUG = 0x04,	/*打开调试日志*/
+	LOG_CHECK_ALL 	= 0x05, /*打开所有日志记录*/
+	LOG_CHECK_MAX,
+}LOG_CHECK_LEVEL;
+
 /*主机数值字节顺序模式*/
 typedef enum _ENDIAN
 {
-    ENDIAN_LITTLE	= 0x01,	/*小端模式(ENDIAN_LITTLE)*/
+    ENDIAN_LITTLE	= 0x01,	/*小端模式(ENDIAN_LITTLE):windows小端模式*/
 	ENDIAN_BIG		= 0x02, /*大端模式(ENDIAN_BIG)*/
 }TOOL_ENDIAN;
 
@@ -89,6 +165,69 @@ typedef enum
 	TYPE_STRING,
 	TYPE_MAX,
 }DATA_TYPE;
+
+/*比较数据范围类型*/
+typedef enum _COMPARE_RANGE_TYPE
+{
+	COMPARE_LMIN = 0x00,	/*<MIN*/
+	COMPARE_LEMIN,			/*<=MIN*/
+	COMPARE_GMAX,			/*>MAX*/
+	COMPARE_GEMAX,			/*>=MAX*/
+	COMPARE_GMIN_LMAX,		/*MIN<X<MAX*/
+	COMPARE_GEMIN_LMAX,		/*MIN<=X<MAX*/
+	COMPARE_GMIN_LEMAX,		/*MIN<X<=MAX*/
+	COMPARE_GEMIN_LEMAX,	/*MIN<=X<=MAX*/
+	COMPARE_MAX		
+}COMPARE_TYPE;
+
+
+/*CRC类型*/
+typedef enum _CRC_MODE
+{
+ 	CRC_MODE_CRC4_ITU = 0,
+	CRC_MODE_CRC5_EPC,
+	CRC_MODE_CRC5_ITU,
+	CRC_MODE_CRC5_USB,
+	CRC_MODE_CRC6_ITU,
+	CRC_MODE_CRC7_MMC,
+	CRC_MODE_CRC8,
+	CRC_MODE_CRC8_ITU,
+	CRC_MODE_CRC8_ROHC,
+	CRC_MODE_CRC8_MAXIM,
+	CRC_MODE_CRC16_IBM,
+	CRC_MODE_CRC16_MAXIM,
+	CRC_MODE_CRC16_USB,
+	CRC_MODE_CRC16_MODBUS,
+ 	CRC_MODE_CRC16_CCITT,
+ 	CRC_MODE_CRC16_CCITT_FALSE,
+ 	CRC_MODE_CRC16_X25,
+ 	CRC_MODE_CRC16_XMODEM,
+ 	CRC_MODE_CRC16_DNP,
+	CRC_MODE_CRC32,
+	CRC_MODE_CRC32_MPEG2,
+	CRC_MODE_CRC8_CUSTOM,
+	CRC_MODE_CRC16_CUSTOM,
+	CRC_MODE_CRC_CUSTOM,
+	CRC_MODE_MAX,
+}CRC_MODE;
+
+typedef enum
+{
+	MONTH_1 = 1,
+	MONTH_2 ,
+	MONTH_3 ,
+	MONTH_4 ,
+	MONTH_5 ,
+	MONTH_6 ,
+	MONTH_7 ,
+	MONTH_8 ,
+	MONTH_9 ,
+	MONTH_10 ,
+	MONTH_11 ,
+	MONTH_12 ,
+	MONTH_MAX,
+}MONTH_KEY;
+
 
 typedef struct
 {
@@ -132,6 +271,41 @@ typedef struct _TLV
 	int iLen;	/*iLen*/
 	unsigned char *pucValue;	/*pucValue*/
 }TLV;
+
+/*TAG数据类型*/
+typedef enum _TLV_TAGTYPE
+{
+  TAGTYPE_NUMERIC = 0,		/*Alpha numeric*/
+  TAGTYPE_BINARY,			/*Binary*/
+  TAGTYPE_BCDNUMBER,		/*BCD*/
+  TAGTYPE_ALPHANUMERIC,		/*Alpha numeric or special character*/
+}TLV_TAGTYPE;
+
+/*TAG数据来源*/
+typedef enum _TLV_TAGSOURCE
+{
+  TAGSOURCE_ICC = 0,		/*IC卡*/
+  TAGSOURCE_ISSUER,			/*发卡行*/
+  TAGSOURCE_TERMINAL,		/*终端*/
+  TAGSOURCE_ISSUERTERMINAL,	/*发卡行或终端*/
+}TLV_TAGSOURCE;
+
+/*EMV TLV信息结构定义*/
+typedef struct _TLVTAG_PRM
+{
+	int iTag;								/*标签整型值*/
+	unsigned char aucTag[4+1];				/*标签字符串值*/
+	int iTagLen;							/*标签的长度*/
+	int iTagValueLen;						/*标签值的长度*/
+	unsigned char ucTagValueLenVarFlag;		/*标签值的长度可变标志:0-不可变,固定 非0-可变*/
+	int iTagValueMinLen;					/*标签值的最小长度*/
+	TLV_TAGTYPE	   ucTagType;				/*标签类型:参考TLV_TAGTYPE*/
+	TLV_TAGSOURCE  ucTagSource;				/*标签来源:参考TLV_TAGSOURCE*/
+	unsigned char ucTemplateFlag;			/*是否模板标志:0-否 非0-是*/
+	unsigned char aucTagEnName[64+1];		/*标签英文名*/
+	unsigned char aucTagCnName[64+1];		/*标签中文名*/
+	unsigned char aucTagShortName[12+1];	/*标签简称名*/
+}TLVTAG_PRM;
 
 /*权重系数比例信息*/
 typedef struct
@@ -195,6 +369,18 @@ typedef struct
 	unsigned char aucPrimeExponent[2][256]; /*CRT指数,素数与指数除法值Dp,Dq*/
 	unsigned char aucCoefficient[256];      /*CRT系数,素数与素数除法值Qinv*/
 }RSAPRIVATEKEY_PRM;
+
+/*CRC类型定义*/
+typedef struct
+{
+	unsigned char width;	/*数据宽度(即CRC比特数):CRC校验码的长度(二进制位数)*/
+	uint32_t poly;			/*多项式简记式(生成项的简写):以16进制表示;如除数11011(poly值为0x1B)的二项式为G(X)=X4+X3+X+1,
+	                  			例如:CRC-32即是0x04C11DB7,忽略了最高位的"1",即完整的生成项是0x104C11DB7,实际使用简记式0x04C11DB7*/
+	uint32_t init;			/*初始值:这是算法开始时寄存器(crc)的初始化预置值,十六进制表示*/
+	unsigned char refIn;	/*输入值是否反转:待测数据的每个字节是否按位反转(True或False)*/
+	unsigned char refOut;	/*输出值是否反转:在计算后之后,异或输出之前:整个数据是否按位反转(True或False)*/
+	uint32_t xorOut;		/*结果异或值:计算结果与此参数异或后得到最终的CRC值*/
+}CRC_TYPE;
 
 /***********************************************************************************************
 	FuncName : Tool_SetTimer
@@ -413,6 +599,11 @@ EXPORT unsigned char Tool_GetDateAndTime(unsigned char ucFormatFlag,unsigned cha
 								   0x1A-HH 0x1B-MM 0x1C-SS
 								   0x20-星期几 0x21-YYYY-MM-DD HH:MM:SS 星期几 0x22-YYYY/MM/DD HH:MM:SS 星期几
 								   0x23-星期一:1 星期二:2 星期三:3 星期四:4 星期五:5 星期六:6  星期日:7
+								   0x24-服务器中文时间格式如:2023/04/03 09:59:47(星期一)
+								   0x25-服务器中文时间格式如:2023-04-03 09:59:47(星期一)
+								   0x26-服务器中文时间格式如:2023年04月03日09时59分47秒(星期一)
+								   0x27-服务器中文时间格式如:2023年04月03日09:59:47(星期一)
+								   0x28-服务器英文时间格式如:Mon, 3 Apr 2023 09:59:47 +0800
 								   其它-YYYYMMDD
 	Output	 : unsigned char *	— pucOutputDate,输出日期信息
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
@@ -473,53 +664,132 @@ EXPORT unsigned char Tool_GetTickCount(double *pdOutputMillSeconds);
 /***********************************************************************************************
 	FuncName : Tool_GetSystemTimeFromUTC
 	FuncFunc : 从UTC时间值获取到现在所经过的秒数
-	Input	 : DWORD			— dwUTCTime,输入UTC时间值
+	Input	 : INT64			— llUTCTime,输入UTC时间值
+	           unsigned char	— ucTimestampFlag,输入时间戳标志:0-秒级 1-毫秒级
+	           unsigned char	— ucGmtFlag,输入时区标志:0-北京时区 非0-非北京时区
 		       unsigned char	— ucSetTimeFlag,是否设置为当前系统时间 0-不设置 1-设置时间为当前系统时间
 	           unsigned char   	— ucFormatFlag,输出日期格式 0x00-YYYYMMDD 0x01-YYYY 0x02-YYYYMM 
 															 0x03-YYMM 0x04-YYMMDD 0x05-MMDD 
-															 0x06-MM 0x07-DD 08-YYYYMMDDHHMMSS 其它-YYYYMMDD
+															 0x06-MM 0x07-DD 08-YYYYMMDDHHMMSS
+															 0x09-YYYYMMDDHHMMSSMSMSMS
+															 0x0A-YYYYMMDDHHMMSS.MSMSMS
+															 0x0B-YYYY-MM-DD HH:MM:SS
+															 0x0C-YYYY/MM/DD HH:MM:SS
+															 其它-YYYYMMDD
 	Output	 : unsigned char *	— pucOutputDate,输出日期信息
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
 								— 失败,返回TOOL_FAILURE(0x01)
 	Author	 : Sunrier
 	Date	 : 2013-07-23 19:00:55
-	Descp    : 从公元 1970 年1 月1 日的UTC 时间从0 时0 分0 秒算起到现在所经过的秒数
-	History  : None
+	Descp    : 从公元1970年1月1日的UTC时间从0时0分0秒算起到现在所经过的秒数
+	History  : 北京时间是中国采用国际时区东八时区的区时作为标准时间:北京时区为GMT加8小时时间差;
+	           北京时间并不是北京(东经116.4°)的地方时间,而是东经120°的地方时间,
+	           故东经120度地方时比北京的地方时早约14分半钟;
+	           因为北京处于国际时区划分中的东八区,
+	           同格林尼治时间(世界时)整整相差8小时(即北京时间=世界时+8小时,GMT+8);
+	           东八区包括的范围从东经112.5°到东经127.5°,以东经120°为中心线,
+	           东西各延伸7.5°,总宽度为15°的区域;
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_GetSystemTimeFromUTC(DWORD dwUTCTime,unsigned char ucSetTimeFlag,unsigned char ucFormatFlag,unsigned char *pucOutputDate);
+EXPORT unsigned char Tool_GetSystemTimeFromUTC(INT64 llUTCTime,unsigned char ucTimestampFlag,unsigned char ucGmtFlag,
+													unsigned char ucSetTimeFlag,unsigned char ucFormatFlag,unsigned char *pucOutputDate);
 
 /***********************************************************************************************
-	FuncName : Tool_GetCurrentSeconds
+	FuncName : Tool_GetTimestamp
 	FuncFunc : 将一个秒数转换为日期时间信息
 	Input	 : long				— lInputSeconds	输入所经过的秒数(S)
 			   unsigned char 	— ucFormatFlag		输出的日期时间格式标志
+			   											0x00-YYYYMMDD
+			   											0x01-YYYY
+			   											0x02-YYYYMM 
+														0x03-YYMM
+														0x04-YYMMDD
+														0x05-MMDD 
+														0x06-MM 
+														0x07-DD 
+														08-YYYYMMDDHHMMSS
+														0x09-YYYY-MM-DD HH:MM:SS
+														0x0A-YYYY/MM/DD HH:MM:SS
+														其它-YYYYMMDDHHMMSS
 	Output	 : unsigned char *	— pucOutputData	输出日期信息YYYYMMDDHHMMSS
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
-								— 失败,返回TOOL_FAILURE(0x01)
+								— 失败,返回相应错误信息(非0)
 	Author	 : Sunrier
 	Date     : 2013-07-23 19:00:55
-	Descp    : 日期时间的字符串 YYYYMMDDHHMMSS(ucFormatFlag==0)或YYYY-MM-DD HH:MM:SS(ucFormatFlag!=0)
-	History  : None
+	Descp    : lInputSeconds最大4294967295(2^32-1)
+	History  : 世界时(UTC)也被称为格林尼治标准时间(GMT)来表示
 	Other    : 输入的秒数为从公元 1970 年1 月1 日的UTC 时间从0 时0 分0 秒算起到现在所经过的秒数
 *************************************************************************************************/
 EXPORT unsigned char Tool_GetTimestamp(long lInputSeconds,unsigned char ucFormatFlag,unsigned char *pucOutputData);
 
 /***********************************************************************************************
+	FuncName : Tool_GetTimestampEx
+	FuncFunc : 将一个秒数转换为日期时间信息
+	Input	 : INT64			— lInputSeconds	输入所经过的秒数(S)
+			   unsigned char 	— ucFormatFlag		输出的日期时间格式标志
+			   											0x00-YYYYMMDD
+			   											0x01-YYYY
+			   											0x02-YYYYMM 
+														0x03-YYMM
+														0x04-YYMMDD
+														0x05-MMDD 
+														0x06-MM 
+														0x07-DD 
+														08-YYYYMMDDHHMMSS
+														0x09-YYYY-MM-DD HH:MM:SS
+														0x0A-YYYY/MM/DD HH:MM:SS
+														其它-YYYYMMDDHHMMSS
+	Output	 : unsigned char *	— pucOutputData	输出日期信息YYYYMMDDHHMMSS
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回相应错误信息(非0)
+	Author	 : Sunrier
+	Date     : 2013-07-23 19:00:55
+	Descp    : lInputSeconds可以大于4294967295(2^32-1),如32503651199
+	           输入lInputSeconds=4294967295(2^32-1),pucOutputData=21060207142815;
+			   输入lInputSeconds=32503651199,pucOutputData=29991231235959;
+	History  : 世界时(UTC)也被称为格林尼治标准时间(GMT)来表示
+	Other    : 输入的秒数为从公元 1970 年1 月1 日的UTC 时间从0 时0 分0 秒算起到现在所经过的秒数
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetTimestampEx(INT64 lInputSeconds,unsigned char ucFormatFlag,unsigned char *pucOutputData);
+
+/***********************************************************************************************
 	FuncName : Tool_TimeToGmt
     FuncFunc : 将YYYYMMDDHHMMSS格式日期转换GMT时间,即从1970/1/1 0时0分0秒到指定时刻的秒数
 	Input	 : const char *		— pucInputDate	输入时间信息(YYYYMMDDHHMMSS)
+	           unsigned char	— ucGmtFlag,输入时区标志:0-北京时区 非0-非北京时区
 	Output	 : time_t *			— plOutputData	输出转换后time_t格式的时间信息
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
 					 			— 失败,返回相应错误信息(非0)
     Author	 : Sunrier
     Date     : 2016-12-23 10:10:22
     Descp    : GMT Time(S)
-	History  : None
+	History  : 世界时(UTC)也被称为格林尼治标准时间(GMT)来表示
+	           北京时间是中国采用国际时区东八时区的区时作为标准时间:北京时区为GMT加8小时时间差;
 	Other    : 例如: 
 			   输入pcInputData=20090228102130,输出plOutputData=134531388
+			   输入pcInputData=21060207142815,输出最大4294967295(2^32-1)
 *************************************************************************************************/  
-EXPORT unsigned char Tool_TimeToGmt(const unsigned char *pucInputDate,time_t *plOutputData);
+EXPORT unsigned char Tool_TimeToGmt(const unsigned char *pucInputDate,unsigned char ucGmtFlag,time_t *plOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_TimeToGmtEx
+    FuncFunc : 将YYYYMMDDHHMMSS格式日期转换GMT时间,即从1970/1/1 0时0分0秒到指定时刻的秒数
+	Input	 : const char *		— pucInputDate	输入时间信息(YYYYMMDDHHMMSS)
+	           unsigned char	— ucGmtFlag,输入时区标志:0-北京时区 非0-非北京时区
+	Output	 : INT64 *			— plOutputData	输出转换后time_t格式的时间信息
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+					 			— 失败,返回相应错误信息(非0)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : GMT Time(S):实现类似_mktime64功能,mktime的扩展
+	History  : 世界时(UTC)也被称为格林尼治标准时间(GMT)来表示
+	           北京时间是中国采用国际时区东八时区的区时作为标准时间:北京时区为GMT加8小时时间差;
+	Other    : 例如: 
+			   输入pcInputData=20090228102130,输出plOutputData=134531388
+			   输入pcInputData=21060207142815,输出plOutputData=4294967295(2^32-1)
+			   输入pcInputData=29991231235959,输出32503651199			   
+*************************************************************************************************/  
+EXPORT unsigned char Tool_TimeToGmtEx(const unsigned char *pucInputDate,unsigned char ucGmtFlag,INT64 *plOutputData);
 
 /***********************************************************************************************
 	FuncName : Tool_ConvertDateAndTime
@@ -535,6 +805,7 @@ EXPORT unsigned char Tool_TimeToGmt(const unsigned char *pucInputDate,time_t *pl
 								   0x07:YYYYMMDD->星期几(星期一-1,星期二-2,星期三-3,星期四-4,星期五-5,星期六-6,星期日-7)
 								   0x08:YYYY/MM/DD HH:MM:SS(非标准2020/8/12 9:09:12)->YYYY/MM/DD HH:MM:SS(标准2020/08/12 09:09:12)
 								   0x09:YYYY/MM/DD HH:MM:SS(非标准2020/8/12 9:09:12)->YYYYMMDDHHMMSS(标准20200812090912)
+								   0x0A:YYYYMMDDHHMMSS->YYYY年MM月DD日 HH:MM:SS
 			   unsigned char *	— pucInputData		输入的日期时间信息
 	Output	 : unsigned char *	— pucOutputData	输出的日期时间信息
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
@@ -546,6 +817,31 @@ EXPORT unsigned char Tool_TimeToGmt(const unsigned char *pucInputDate,time_t *pl
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_ConvertDateAndTime(unsigned char ucFormatFlag,unsigned char *pucInputData,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_GetSysTime
+	FuncFunc : 获取系统的UTC时间信息
+	Input	 : unsigned char   	— ucFormatFlag,输入输出的日期格式标志:
+                                                             0x00-YYYYMMDD 0x01-YYYY 0x02-YYYYMM 
+															 0x03-YYMM 0x04-YYMMDD 0x05-MMDD 
+															 0x06-MM 0x07-DD 08-YYYYMMDDHHMMSS
+															 0x09-YYYYMMDDHHMMSSMSMSMS
+															 0x0A-YYYYMMDDHHMMSS.MSMSMS
+															 0x0B-YYYY-MM-DD HH:MM:SS
+															 0x0C-YYYY/MM/DD HH:MM:SS
+															 0x0D-S(世界时区:所经过的秒数)
+															 0x0E-S(北京时区:所经过的秒数)
+															 其它-YYYYMMDD
+	Output	 : unsigned char *	— pucOutputDate,输出日期信息
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回相应错误信息(非0)
+	Author	 : Sunrier
+	Date     : 2013-07-23 19:00:55
+	Descp    : UTC时间
+	History  : None
+	Other    : 输入的年是从1970年开始的计数
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetSysTime(unsigned char ucFormatFlag,unsigned char *pucOutputDate);
 
 /***********************************************************************************************
 	FuncName : Tool_SetSysTime
@@ -615,13 +911,13 @@ EXPORT unsigned char Tool_Rand(unsigned int uiInputRandNumer,unsigned char *pucO
 	Input	 : unsigned int 	— uiInputRandNumer   	输入需要生成的随机数据个数
 			   unsigned int 	— uiMin   				输入生成的最小的数
 	           unsigned int 	— uiMax   				输入生成的最大的数
-	Output	 : unsigned char *  — pucOutputData  		输出生成的随机数据
+	Output	 : unsigned int *  	— puiOutputData  		输出生成的随机数据
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
 								— 失败,返回TOOL_FAILURE(0x01)
 	Author   : Sunrier    
 	Date     : 2010-09-23 16:07:05
 	Descp    : 数据取值范围uiMin~uiMax
-	History  : None
+	History  : 0~32767
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_RandInt(unsigned int uiInputRandNumer,unsigned int uiMin,unsigned int uiMax,unsigned int *puiOutputData);
@@ -704,11 +1000,34 @@ EXPORT unsigned char Tool_Pow2gt(int iInputData,int *piOutputData);
 							 	 	—输入参数有误,返回TOOL_PARAMERROR(0x04)
 	Author		:  Sunrier
 	Date     	:  2011-07-18 19:13:21
-	Descp    	:  None
+	Descp    	:  pucInputData1=0x00 0x11 0x22 0x33 0x44 0x55 0x66 0x77 0x88
+	               pucInputData2=0xFF 0xEE 0xDD 0xCC 0xBB 0xAA 0x99 0x88 0x77
+	               uiInputDataLen=8;
+	               pucOutputData=0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
 	History  	:  None
 	Other    	:  None
 *************************************************************************************************/
 EXPORT unsigned char Tool_Xor(unsigned char *pucInputData1,unsigned char *pucInputData2,unsigned int uiInputDataLen,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName 	:  Tool_StrXor
+	FuncFunc 	:  两组字符串数据之间异或运算
+	Input	 	:  unsigned char *	—pucInputData1 		输入的数据1
+    			   unsigned char *	—pucInputData2 		输入的数据2
+    			   unsigned int 	—uiInputDataLen	    输入异或数据的长度
+	Output	 	:  unsigned char * 	—pucOutputData  		输出数据
+	Return	 	:  unsigned	char 	—成功,返回TOOL_SUCCESS(0x00)
+							 	 	—失败,返回TOOL_FAILURE(0x01)
+							 	 	— 输入参数有误,返回TOOL_PARAMERROR(0x04)
+	Author		:  Sunrier
+	Date     	:  2011-07-18 19:13:21
+	Descp    	:  pucInputData1="001122334455667788"
+	               pucInputData2="FFEEDDCCBBAA998877"
+	               pucOutputData="FFFFFFFFFFFFFFFFFF"
+	History  	:  None
+	Other    	:  None
+*************************************************************************************************/
+EXPORT unsigned char Tool_StrXor(unsigned char *pucInputData1,unsigned char *pucInputData2,unsigned char *pucOutputData);
 
 /*********************************************************************************************** 
 	FuncName : Tool_DataXor  
@@ -778,6 +1097,25 @@ EXPORT unsigned char Tool_Not(unsigned char *pucInputData,unsigned int uiInputDa
 EXPORT unsigned char Tool_GetCheckSum(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char *pucCheckSum);
 
 /***********************************************************************************************
+	FuncName : Tool_IsRangeByte
+	FuncFunc : 比较字节数据是否在指定的范围内
+	Input	 : unsigned char 	— ucCompareFlag,输入比较范围标志
+	           unsigned char	— ucMin,输入最小范围
+	           unsigned char	— ucMax,输入最大范围
+	           unsigned char 	— ucInputData,输入的数据
+	Output	 : None
+	Return	 : unsigned char	— 范围内,返回TOOL_SUCCESS(0x00)
+					 			   超出范围,返回TOOL_FAILURE(0x01)
+					 			   数据无效,返回TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : 字节数据(unsigned char)
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_IsRangeByte(unsigned char ucCompareFlag,unsigned char ucMin,unsigned char ucMax,unsigned char ucInputData);
+
+/***********************************************************************************************
 	FuncName : Tool_AscToHex
 	FuncFunc : ASCII转化为HEX
 	Input	 : unsigned char *	— pucInputData		输入的ASCII数据(输入的数据长度是输出的两倍,即2*uiOutputLen)
@@ -795,6 +1133,24 @@ EXPORT unsigned char Tool_GetCheckSum(unsigned char *pucInputData,unsigned int u
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_AscToHex(unsigned char *pucInputData,unsigned int uiOutputDataLen,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_AscToHexEx
+	FuncFunc : ASCII转化为主机序的HEX数值
+	Input	 : unsigned char *	— pucInputData		输入的ASCII数据
+	           int 				— iInputDataLen	输入的ASCII数据长度
+			   int 				— iOutputDataLen	输出的HEX数据长度
+	Output	 : unsigned char *	— pucOutputData	输出的HEX数据
+	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
+							 	— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-28 19:10:22
+	Descp    : 如 输入12345,iInputDataLen = 5;
+    			  输出12345,iOutputDataLen = sizeof(INT32);
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_AscToHexEx(unsigned char *pucInputData,int iInputDataLen,unsigned char *pucOutputData,int iOutputDataLen);
 
 /***********************************************************************************************
 	FuncName : Tool_AscToBcd
@@ -1030,20 +1386,28 @@ EXPORT unsigned char Tool_CharToBitStr(unsigned char ucInputData,unsigned char *
 
 /***********************************************************************************************
 	FuncName : Tool_CharToHex
-	FuncFunc : 字符转化为HEX
+	FuncFunc : 字符转化为HEX对应的十进制数
 	Input	 : unsigned char	— ucInputData	输入的数据
-	Output	 : void
-	Return	 : 返回HEX形式
+	Output	 : None
+	Return	 : unsigned	char 	— 成功,返回HEX形式对应的十进制数
 	Author	 : Sunrier
 	Date     : 2011-07-28 19:10:22
-	Descp    : 如 输入'1'
-    			  输出1
-    		   如 输入'a'或者'A'
-    			  输出a或者A(即十进制为10)
-    		   如 输入大于'f'或者'F'
-    			  输出f或者F(即十进制为15)
-	History  : None
-	Other    : None
+	Descp    : 如输入ucInputData='0'
+    			 返回0
+    		   如输入ucInputData='1'
+    			 返回1
+    		   如输入ucInputData='9'
+    			 返回9
+    		   如输入ucInputData='a'或者ucInputData='A'
+    			 返回10
+    		   如输入ucInputData='f'或者ucInputData='F'
+    			 返回15
+    		   如输入ucInputData=0x20
+    			 返回0
+    		   如输入ucInputData=0xFF
+    			 返回8
+	History  : 默认输入数据合法,不检查输入数据有效性
+	Other    : 功能同Tool_HexToDec,如果需要检查数据的有效性,请使用Tool_HexToDec
 *************************************************************************************************/
 EXPORT unsigned char Tool_CharToHex(unsigned char ucInputData);
 
@@ -1102,6 +1466,77 @@ EXPORT unsigned char Tool_CharLowCase(unsigned char ucInputData,unsigned char *p
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_CharUpperCase(unsigned char ucInputData,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_DecToHex
+	FuncFunc : HEX对应的十进制数转化为十六进制字符
+	Input	 : int				— iInputData	输入的数据
+	Output	 : None
+	Return	 : unsigned	char	— 成功,返回十进制数对应的HEX字符串形式('0'~'9','A'~'F')
+	                            — 失败,返回0
+	Author	 : Sunrier
+	Date     : 2011-07-28 19:10:22
+	Descp    : 如输入ucInputData=0
+    			 返回'0'==0x30
+    		   如输入ucInputData=1
+    			 返回'1'==0x31
+    		   如输入ucInputData=9
+    			 返回'9'==0x39
+    		   如输入ucInputData=10
+    			 返回'A'==0x41
+    		   如输入ucInputData=12
+    			 返回'C'==0x43
+    		   如输入ucInputData=15
+    			 返回'F'==0x46
+    		   如输入ucInputData=-1
+    			 返回失败0
+    		   如输入ucInputData=128
+    			 返回失败0
+    		   如输入ucInputData=255
+    			 返回失败0
+	History  : 检查输入数据有效性,默认大写字母
+	Other    : 和Tool_HexToDec相反操作
+*************************************************************************************************/
+EXPORT unsigned char Tool_DecToHex(int iInputData);
+
+/***********************************************************************************************
+	FuncName : Tool_DecToHexEx
+	FuncFunc : HEX对应的十进制数转化为十六进制字符
+	Input	 : int				— iInputData	输入的数据
+	           unsigned char	— ucCaseFlag	输入大小写字母标志:0-大写 非0-小写
+	Output	 : None
+	Return	 : unsigned	char	— 成功,返回十进制数对应的HEX字符串形式('0'~'9','A'~'F'或'a'~'f')
+	                            — 失败,返回0
+	Author	 : Sunrier
+	Date     : 2011-07-28 19:10:22
+	Descp    : 如输入ucInputData=0
+    			 返回'0'==0x30
+    		   如输入ucInputData=1
+    			 返回'1'==0x31
+    		   如输入ucInputData=9
+    			 返回'9'==0x39
+    		   如输入ucInputData=10,ucCaseFlag=0
+    			 返回'A'==0x41
+    		   如输入ucInputData=12,ucCaseFlag=0
+    			 返回'C'==0x43
+    		   如输入ucInputData=15,ucCaseFlag=0
+    			 返回'F'==0x46
+    		   如输入ucInputData=10,ucCaseFlag=1
+    			 返回'a'==0x61
+    		   如输入ucInputData=12,ucCaseFlag=1
+    			 返回'c'==0x63
+    		   如输入ucInputData=15,ucCaseFlag=1
+    			 返回'f'==0x66
+    		   如输入ucInputData=-1
+    			 返回失败0
+    		   如输入ucInputData=128
+    			 返回失败0
+    		   如输入ucInputData=255
+    			 返回失败0
+	History  : 检查输入数据有效性
+	Other    : 和Tool_HexToDec相反操作
+*************************************************************************************************/
+EXPORT unsigned char Tool_DecToHexEx(int iInputData,unsigned char ucCaseFlag);
 
 /***********************************************************************************************
 	FuncName : Tool_HexToBinary
@@ -1194,8 +1629,58 @@ EXPORT unsigned char Tool_HexToBcdLong(unsigned char ucInputData,unsigned long *
 EXPORT unsigned char Tool_HexToStr(unsigned char *pucInputData,unsigned int uiOutputDataLen,unsigned char *pucOutputData);
 
 /***********************************************************************************************
+	FuncName : Tool_HexToDec
+	FuncFunc : 十六进制字符转化为HEX对应的十进制数
+	Input	 : unsigned char	— ucInputData	输入的数据
+	Output	 : None
+	Return	 : unsigned	char	— 成功,返回HEX形式对应的十进制数(<16)
+	                            — 失败,返回>=16
+	Author	 : Sunrier
+	Date     : 2011-07-28 19:10:22
+	Descp    : 如输入ucInputData='0'
+    			 返回0
+    		   如输入ucInputData='1'
+    			 返回1
+    		   如输入ucInputData='9'
+    			 返回9
+    		   如输入ucInputData='a'或者ucInputData='A'
+    			 返回10
+    		   如输入ucInputData='f'或者ucInputData='F'
+    			 返回15
+    		   如输入ucInputData=0x20
+    			 返回失败16
+    		   如输入ucInputData=0xFF
+    			 返回失败16
+	History  : 检查输入数据有效性
+	Other    : 和Tool_DecToHex相反操作
+*************************************************************************************************/
+EXPORT unsigned char Tool_HexToDec(unsigned char ucInputData);
+
+/***********************************************************************************************
 	FuncName : Tool_HexToInt
 	FuncFunc : 十六进制转换成无符号整型
+	Input	 : unsigned char *	— pucInputData		输入的数据
+	           unsigned int 	— uiOutputDataLen	输出的数据长度位数
+	Output	 : unsigned int*	— puiOutputData	输出的无符号整型数据
+	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
+							 	— 失败,返回TOOL_FAILURE(0x01)
+							 	— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如 输入0x12 0x34 0x56 0x78,uiOutputDataLen = 1;
+    			  输出0x12
+    		   如 输入0x12 0x34 0x56 0x78,uiOutputDataLen = 2;
+    			  输出0x1234
+    		   如 输入0x12 0x34 0x56 0x78,uiOutputDataLen = 4;
+    			  输出0x12345678
+	History  : None
+	Other    : None
+*************************************************************************************************/
+unsigned char Tool_HexToInt(unsigned char *pucInputData,unsigned int uiOutputDataLen,unsigned int *puiOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_HexStrToInt
+	FuncFunc : 十六进制字符串转换成无符号整型
 	Input	 : unsigned char *	— pucInputData		输入的数据
 	Output	 : unsigned int*	— puiOutputData	输出的无符号整型数据
 	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
@@ -1207,7 +1692,7 @@ EXPORT unsigned char Tool_HexToStr(unsigned char *pucInputData,unsigned int uiOu
 	History  : None
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_HexToInt(unsigned char *pucInputData,unsigned int *puiOutputData);
+EXPORT unsigned char Tool_HexStrToInt(unsigned char *pucInputData,unsigned int *puiOutputData);
 
 /***********************************************************************************************
 	FuncName : Tool_HexToLong
@@ -1226,10 +1711,68 @@ EXPORT unsigned char Tool_HexToInt(unsigned char *pucInputData,unsigned int *pui
     			  输出0x1234
     		   如 输入0x12 0x34 0x56 0x78 0x90,uiOutputDataLen = 4;
     			  输出0x12345678
-	History  : None
+	History  : 最大输入0xFF 0xFF 0xFF 0xFF,uiOutputDataLen = 4,
+	           最大输出0xFFFFFFFF=4294967295
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_HexToLong(unsigned char *pucInputData,unsigned int uiOutputDataLen,unsigned long *pulOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_HexToULongLong
+	FuncFunc : 十六进制转换成无符号超长整型
+	Input	 : unsigned char *	— pucInputData		输入的数据
+			   unsigned int 	— uiOutputDataLen	输出的数据长度位数
+	Output	 : UINT64 *			— pullOutputData	输出的无符号超长整型数据
+	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
+							 	— 失败,返回TOOL_FAILURE(0x01)
+							 	— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如 输入0x12 0x34 0x56 0x78 0x90,uiOutputDataLen = 1;
+    			  输出0x12
+    		   如 输入0x12 0x34 0x56 0x78 0x90,uiOutputDataLen = 2;
+    			  输出0x1234
+    		   如 输入0x12 0x34 0x56 0x78 0x90 0x12 0x34 0x56 0x78 0x90,uiOutputDataLen = 8;
+    			  输出0x1234567812345678
+			   如 输入0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF,uiOutputDataLen = 8;
+    			  输出0xFFFFFFFFFFFFFFFF=18446744073709551615    		   
+	History  : 最大输入0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF,uiOutputDataLen = 8,
+	           最大输出0xFFFFFFFFFFFFFFFF=18446744073709551615
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_HexToULongLong(unsigned char *pucInputData,unsigned int uiOutputDataLen,UINT64 *pullOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_HexStrToLong
+	FuncFunc : 十六进制字符串转换成无符号长整型
+	Input	 : unsigned char *	— pucInputData		输入的数据
+			   unsigned int 	— uiInputDataLen	输入的数据长度
+	Output	 : unsigned long *	— pulOutputData	输出的无符号长整型数据
+	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
+							 	— 失败,返回TOOL_FAILURE(0x01)
+							 	— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如 输入"0001",uiInputDataLen = 2;
+    			  输出*pulOutputData=0
+    		   如 输入"0C3F",uiInputDataLen = 2;
+    			  输出*pulOutputData=12
+    		   如 输入"1000",uiInputDataLen = 2;
+    			  输出*pulOutputData=16
+    		   如 输入"FFFF",uiInputDataLen = 2;
+    			  输出*pulOutputData=255
+    		   如 输入"0001",uiInputDataLen = 4;
+    			  输出*pulOutputData=1
+    		   如 输入"0C3F",uiInputDataLen = 4;
+    			  输出*pulOutputData=3135
+    		   如 输入"1000",uiInputDataLen = 4;
+    			  输出*pulOutputData=4096
+    		   如 输入"FFFF",uiInputDataLen = 4;
+    			  输出*pulOutputData=65535
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_HexStrToLong(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned long *pulOutputData);
 
 /***********************************************************************************************
 	FuncName : Tool_IntToAsc
@@ -1329,6 +1872,38 @@ EXPORT unsigned char Tool_IntToStr(unsigned int uiInputData,unsigned int uiOutpu
 EXPORT unsigned char Tool_IntToStrEx(int iInputData,int iOutputDataLen,char *pcOutputData);
 
 /***********************************************************************************************
+	FuncName : Tool_Int32ToStr
+	FuncFunc : INT32整型转换成字符串
+	Input	 : INT32			— i32InputData		输入的INT32整型数据
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+								— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如 输入12345,输出"12345"
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_Int32ToStr(INT32 i32InputData,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_Int64ToStr
+	FuncFunc : INT64整型转换成字符串
+	Input	 : INT64			— i64InputData		输入的INT64整型数据
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+								— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如 输入12345,输出"12345"
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_Int64ToStr(INT64 i64InputData,unsigned char *pucOutputData);
+
+/***********************************************************************************************
 	FuncName : Tool_LongToAsc
 	FuncFunc : 无符号长整型转换成ASCII码
 	Input	 : unsigned long	— ulInputData		输入的长整型数据
@@ -1409,6 +1984,26 @@ EXPORT unsigned char Tool_LongToHex(unsigned long ulInputData,unsigned int uiOut
 EXPORT unsigned char Tool_LongToHexEx(unsigned long ulInputData,unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
 
 /***********************************************************************************************
+	FuncName : Tool_LongToHexStr
+	FuncFunc : 无符号长整型转换成十六进制码字符串
+	Input	 : unsigned long 	— ulInputData		输入的长整型数据
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+	           unsigned int *	— puiOutputDataLen	输出的数据长度
+	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
+							 	— 失败,返回TOOL_FAILURE(0x01)
+							 	— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如 输入1234567890(0x499602D2),ucOutputDataLen = 4;
+    			  输出"02D2"
+    		   如 输入1234567890(0x499602D2),ucOutputDataLen = 10;
+    			  输出"0x00499602D2"
+	History  : 输出长度为偶数
+	Other    : unsigned long 最大4294967295
+*************************************************************************************************/
+EXPORT unsigned char Tool_LongToHexStr(unsigned long ulInputData, unsigned char ucOutputDataLen, unsigned char *pucOutputData);
+
+/***********************************************************************************************
 	FuncName : Tool_LongToStr
 	FuncFunc : 无符号长整型转换成字符串
 	Input	 : unsigned long	— ulInputData		输入的长整型数据
@@ -1444,6 +2039,59 @@ EXPORT unsigned char Tool_LongToStr(unsigned long ulInputData,unsigned int uiOut
 	Other    : 如:lInputData=123,iOutputDataLen=5,pcOutputData="00123"
 *************************************************************************************************/
 EXPORT unsigned char Tool_LongToStrEx(long lInputData,int iOutputDataLen,char *pcOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_Uint64ToHex
+	FuncFunc : 无符号64位长整型转换成十六进制码
+	Input	 : UINT64 			— ui64InputData	输入的数据
+	           unsigned int		— uiOutputDataLen	输出数据的长度
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)或TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : 如果不足8字节前面补0x00
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_Uint64ToHex(UINT64 ui64InputData,unsigned int uiOutputDataLen,unsigned char* pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_Uint64ToHexEx
+	FuncFunc : 无符号64位长整型转换成十六进制码
+	Input	 : UINT64 			— ui64InputData	输入的数据
+	           unsigned int	*	— puiOutputDataLen	输入输出数据的长度
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+	           unsigned int	*	— puiOutputDataLen	输出数据的长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)或TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : 如果不足8字节前面不补0x00
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_Uint64ToHexEx(UINT64 ui64InputData,unsigned char* pucOutputData,unsigned int *puiOutputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_Itoa
+	FuncFunc : 将一个字符转换指定进制的字符串
+	Input	 : int 				— iInputData		输入的整型数据
+	           int 				— iRadix			输入的转换后的进制数
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+								— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如 iInputData=122,iRadix=2
+    			  pucOutputData="01111010"
+    		   如 输入iInputData=50,iRadix=2
+    			  pucOutputData="00110010"
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_Itoa(int iInputData,int iRadix,unsigned char *pucOutputData);
 
 /***********************************************************************************************
 	FuncName : Tool_FloatToStr
@@ -1552,6 +2200,57 @@ EXPORT unsigned char Tool_StrToInt(unsigned char *pucInputData,int iInputDataLen
 	Other    : 该函数转换的数应小于1000000000
 *************************************************************************************************/
 EXPORT unsigned char Tool_StrToLong(unsigned char *pucInputData,unsigned long *pulOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_StrToInt32
+    FuncFunc : 将字符串转换为INT32型
+	Input	 : unsigned char *	— pucInputData		输入字符串数据
+			   int				— iInputDataLen	输入字符串数据的长度
+	Output	 : INT32 *			— pi32OutputData	输出整型数据
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+					 			— 失败,返回相应错误信息(非0)
+					 			— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : 如:pcInputData="123",iInputDataLen=3,*pi32OutputData=123
+*************************************************************************************************/
+EXPORT unsigned char Tool_StrToInt32(unsigned char *pucInputData,int iInputDataLen,INT32 *pi32OutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_StrToInt64
+    FuncFunc : 将字符串转换为INT64型
+	Input	 : unsigned char *	— pucInputData		输入字符串数据
+			   int				— iInputDataLen	输入字符串数据的长度
+	Output	 : INT64 *			— pi64OutputData	输出整型数据
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+					 			— 失败,返回相应错误信息(非0)
+					 			— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : INT64范围:-9223372036854775808~9223372036854775807
+	History  : None
+	Other    : 如:pcInputData="123",iInputDataLen=3,*pi32OutputData=123
+*************************************************************************************************/
+EXPORT unsigned char Tool_StrToInt64(unsigned char *pucInputData,int iInputDataLen,INT64 *pi64OutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_StrToUint64
+    FuncFunc : 将字符串转换为UINT64型
+	Input	 : unsigned char *	— pucInputData		输入字符串数据
+			   int				— iInputDataLen	输入字符串数据的长度
+	Output	 : UINT64 *			— pui64OutputData	输出整型数据
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+					 			— 失败,返回相应错误信息(非0)
+					 			— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : UINT64范围:0~18446744073709551615
+	History  : None
+	Other    : 如:pcInputData="10446744073709551615",iInputDataLen=20,*pi32OutputData=10446744073709551615
+*************************************************************************************************/
+EXPORT unsigned char Tool_StrToUint64(unsigned char *pucInputData,int iInputDataLen,UINT64 *pui64OutputData);
 
 /***********************************************************************************************
 	FuncName : Tool_StrToFloat
@@ -2008,6 +2707,64 @@ EXPORT unsigned char Tool_StrFindSubTimes(unsigned char *pucInputData,unsigned c
 EXPORT unsigned char Tool_StrReplace(unsigned char *pucInOutputData,unsigned char *pucOldStr,unsigned char *pucNewStr);
 
 /***********************************************************************************************
+	FuncName : Tool_GetBitFromUlongToHex
+	FuncFunc : 获取从无符号长整型转换成十六进制码字符后的位数
+	Input	 : unsigned long 	— ulInputData		输入的长整型数据
+	Output	 : unsigned char *	— pucOutputDataLen	输出数据的位数
+	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
+							 	— 失败,返回TOOL_FAILURE(0x01)
+							 	— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如输入54(0x36),输出pucOutputDataLen = 2;
+		       如输入130(0x82),输出pucOutputDataLen = 2;
+		       如输入511(0x1FF),输出pucOutputDataLen = 3;
+    		   如输入1879048191(0x6FFFFFFF),输出pucOutputDataLen = 8;
+	History  : None
+	Other    : unsigned long 最大4294967295(0xFFFFFFFF),输出pucOutputDataLen = 8;
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetBitFromUlongToHex(unsigned long ulInputData,unsigned char *pucOutputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_GetBitFromUlonglongToHex
+	FuncFunc : 获取从无符号超长整型转换成十六进制码字符后的位数
+	Input	 : UINT64 			— ullInputData		输入的超长整型数据
+	Output	 : unsigned char *	— pucOutputDataLen	输出数据的位数
+	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
+							 	— 失败,返回TOOL_FAILURE(0x01)
+							 	— 输入参数无效,返回TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如输入54(0x36),输出pucOutputDataLen = 2;
+		       如输入130(0x82),输出pucOutputDataLen = 2;
+		       如输入511(0x1FF),输出pucOutputDataLen = 3;
+    		   如输入1879048191(0x6FFFFFFF),输出pucOutputDataLen = 8;
+    		   如输入4294967295(0xFFFFFFFF),输出pucOutputDataLen = 8;
+    		   如输入18446744073709551615(0xFFFFFFFFFFFFFFFF),输出pucOutputDataLen = 16;
+	History  : None
+	Other    : unsigned long 最大18446744073709551615(0xFFFFFFFFFFFFFFFF),输出pucOutputDataLen = 16;
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetBitFromUlonglongToHex(UINT64 ullInputData,unsigned char *pucOutputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_CheckHexVaildByBits
+	FuncFunc : 根据位数检查十六进制数是否有效
+	Input	 : unsigned char *	— pucInputData		输入十六进制数据
+	           unsigned int 	— uiInputDataLen	输入十六进制数据的长度
+	           unsigned char 	— ucBits			输入有效位数(1到64位)
+	Output	 : None
+	Return	 : unsigned	char 	— 有效,返回TOOL_SUCCESS(0x00)
+							 	— 无效,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如 输入pucInputData=0x36,uiInputDataLen=1,ucBits=3,返回无效;
+		       如 输入pucInputData=0x36,uiInputDataLen=1,ucBits=9,返回无效;
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_CheckHexVaildByBits(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char ucBits);
+
+/***********************************************************************************************
 	FuncName : Tool_DigitalStrRightAlign
 	FuncFunc : 数字组成的字符串右边对齐,左边不足补特定字符
 	Input	 : unsigned char *	— pucInOutputData		输入字符串只从数字部分开始处理,字符长度最大为规定的长度(可以输入字符串为空)
@@ -2068,8 +2825,8 @@ EXPORT unsigned char Tool_DigitalStrSub(unsigned char *pucInOutputMinuend,unsign
 	FuncFunc : 获取主机的数值类型的字序类型
 	Input	 : None
 	Output	 : None
-	Return	 : unsigned char	— 大端模式,返回TOOL_SUCCESS(0x02)
-								— 小端模式,返回TOOL_FAILURE(0x01)
+	Return	 : unsigned char	— 大端模式,返回(0x02)
+								— 小端模式,返回(0x01)
 	Author	 : Sunrier
 	Date     : 2011-04-21 19:10:22
 	Descp    : 大端模式,低位在前(高地址),高位在后(低地址)
@@ -2142,7 +2899,7 @@ EXPORT unsigned char Tool_LittleEndian(unsigned char *pucInputData,unsigned int 
 EXPORT unsigned char Tool_BigEndian(unsigned char *pucInputData,unsigned int *puiOutputData);
 
 /***********************************************************************************************
-	FuncName : Tool_ByteToINT32
+	FuncName : Tool_ByteToInt32
 	FuncFunc : 从当前主机字节序转换为指定字节序
 	Input	 : unsigned char *	— pucInputData		输入的数据
 	           unsigned int		— uiInputDataLen	输入数据的长度
@@ -2158,10 +2915,28 @@ EXPORT unsigned char Tool_BigEndian(unsigned char *pucInputData,unsigned int *pu
 	History  : None
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_ByteToINT32(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char ucEndianType,INT32 *pi32Data);
+EXPORT unsigned char Tool_ByteToInt32(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char ucEndianType,INT32 *pi32Data);
 
 /***********************************************************************************************
-	FuncName : Tool_INT64ToByte
+	FuncName : Tool_ByteToUint64
+	FuncFunc : 从当前主机字节序转换为指定字节序
+	Input	 : unsigned char *	— pucInputData		输入的数据
+	           unsigned int		— uiInputDataLen	输入数据的长度
+	           unsigned char	— ucEndianType	输入转换后的字节序类型
+	                               0x01:小端模式 0x02:大端模式	           
+	Output	 : UINT64 *			— pui64Data		输出的数据
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)或TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : 大端模式,低位在前(高地址),高位在后(低地址)
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_ByteToUint64(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char ucEndianType,UINT64 *pui64Data);
+
+/***********************************************************************************************
+	FuncName : Tool_Int64ToByte
 	FuncFunc : 从当前主机字节序转换为指定字节序
 	Input	 : INT64 			— i64InputData		输入的数据
 	           unsigned int		— uiInputDataLen	输入数据的长度
@@ -2177,7 +2952,27 @@ EXPORT unsigned char Tool_ByteToINT32(unsigned char *pucInputData,unsigned int u
 	History  : None
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_INT64ToByte(__int64 i64InputData,unsigned int uiInputDataLen,unsigned char ucEndianType,unsigned int uiOutputDataLen,unsigned char* pucOutputData);
+EXPORT unsigned char Tool_Int64ToByte(INT64 i64InputData,unsigned int uiInputDataLen,unsigned char ucEndianType,unsigned int uiOutputDataLen,unsigned char* pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_Uint64ToByte
+	FuncFunc : 从当前主机字节序转换为指定字节序
+	Input	 : UINT64 			— ui64InputData	输入的数据
+	           unsigned int		— uiInputDataLen	输入数据的长度
+	           unsigned char	— ucEndianType		输入转换后的字节序类型
+	                               0x01:小端模式 0x02:大端模式
+	           unsigned int		— uiOutputDataLen	输出数据的长度
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)或TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : 大端模式,低位在前(高地址),高位在后(低地址)
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_Uint64ToByte(UINT64 ui64InputData,unsigned int uiInputDataLen,unsigned char ucEndianType,
+									unsigned int uiOutputDataLen,unsigned char* pucOutputData);
 
 /***********************************************************************************************
 	FuncName : Tool_BinaryToValue
@@ -2685,8 +3480,9 @@ EXPORT unsigned char Tool_FormatWarningEx(unsigned char ucTimerFlag,unsigned lon
 	FuncName : Tool_CheckLogLevel
 	FuncFunc : 检查当前日志标志是否为指定的日志等级
 	Input	 : unsigned char	— ucInputLogFlag 	输入的调试等级
-		       unsigned char 	— ucLogLevel 		检查的日志等级
-		       										ucLogLevel:0-无日志级别
+		       unsigned char 	— ucLogCheckLevel	检查的日志等级
+		       										LOG_CHECK_LEVEL:
+		       										           0-无日志级别
 		       												   1-ERROR级别 
 		       												   2-WARN级别
 		       												   3-INFO级别
@@ -2701,7 +3497,7 @@ EXPORT unsigned char Tool_FormatWarningEx(unsigned char ucTimerFlag,unsigned lon
 	History  : None
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_CheckLogLevel(unsigned char ucInputLogFlag,unsigned char ucLogLevel);
+EXPORT unsigned char Tool_CheckLogLevel(unsigned char ucInputLogFlag,unsigned char ucLogCheckLevel);
 
 /***********************************************************************************************
 	FuncName : Tool_TraceLog
@@ -2710,8 +3506,9 @@ EXPORT unsigned char Tool_CheckLogLevel(unsigned char ucInputLogFlag,unsigned ch
 	                                                        1-检查日志级别,输出带对应日志级别的调试信息 
 	                                                        2-不检查日志级别,输出带调试信息
 	                                                        3-检查日志级别,输出不带调试信息 
-			   unsigned char	— ucInputLogLevel 	输入的调试等级
-		       unsigned char 	— ucCheckLogLevel	检查的日志等级:0-无日志级别
+			   unsigned char	— ucInputLogLevel 	输入的调试等级(枚举类型LOG_LEVEL的组合使用)
+		       unsigned char 	— ucCheckLogLevel	检查的日志等级(参考枚举类型LOG_CHECK_LEVEL)
+		                                                           :0-无日志级别
 		       												   	   1-ERROR级别
 		       												   	   2-WARN级别
 		       												   	   3-INFO级别
@@ -2725,7 +3522,7 @@ EXPORT unsigned char Tool_CheckLogLevel(unsigned char ucInputLogFlag,unsigned ch
 			                                            ucCRFlag 0x00-不换行 
 										    	        ucCRFlag&0x01-写文件信息之前先换行
 										    	        ucCRFlag&0x02-写文件信息完换行 
-		       unsigned char *	— pucDebugFileName		当前程序跟踪的文件名
+		       char *			— pcDebugFileName		当前程序跟踪的文件名
 			   int				— iLine				该文件跟踪所在行
 			   const char *		— pFmt					格式化字符串
 			   ...				-  						格式化字符串
@@ -2738,13 +3535,13 @@ EXPORT unsigned char Tool_CheckLogLevel(unsigned char ucInputLogFlag,unsigned ch
 	History  : None
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_TraceLog(unsigned char ucLogFlag,unsigned char ucInputLogLevel,unsigned char ucCheckLogLevel,unsigned char *pucInputFilePathName,unsigned char *pucInputFileName,unsigned char ucFileFlag,unsigned char ucCRFlag,unsigned char *pucDebugFileName,int iLine,const char *pFmt, ...);
+EXPORT unsigned char Tool_TraceLog(unsigned char ucLogFlag,unsigned char ucInputLogLevel,unsigned char ucCheckLogLevel,unsigned char *pucInputFilePathName,unsigned char *pucInputFileName,unsigned char ucFileFlag,unsigned char ucCRFlag,char *pcDebugFileName,int iLine,const char *pFmt, ...);
 
 /***********************************************************************************************
 	FuncName : Tool_TraceInfor
 	FuncFunc : 跟踪信息显示到界面
 	Input	 : unsigned char    — ucFormatFlag		输入格式标志
-	           unsigned char *	— pucDebugFileName	当前程序跟踪的文件名
+	           char *			— pcDebugFileName	当前程序跟踪的文件名
 			   int				— iLine			该文件跟踪所在行
 			   const char *		— pFmt				格式化字符串
 			   ...				-  					格式化字符串
@@ -2760,7 +3557,7 @@ EXPORT unsigned char Tool_TraceLog(unsigned char ucLogFlag,unsigned char ucInput
 	History  : None
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_TraceInfor(unsigned char ucFormatFlag,unsigned char *pucDebugFileName,int iLine,const char *pFmt, ...);
+EXPORT unsigned char Tool_TraceInfor(unsigned char ucFormatFlag,char *pcDebugFileName,int iLine,const char *pFmt, ...);
 
 /***********************************************************************************************
 	FuncName : Tool_IsNullData
@@ -2956,14 +3753,27 @@ EXPORT unsigned char Tool_CheckLeapYear(unsigned long ulInputYear);
 /***********************************************************************************************
 	FuncName : Tool_CheckValidDate
 	FuncFunc : 检查日期是否合法
-	Input	 : unsigned char 	— ucFormatFlag 输入日期格式: 0x00-YYYYMMDD 0x01-YYYYMM 
-														      0x02-YYMMDD 0x03-YYMM 0x04-MMDD
-														      0x05-YYYYMMDDHHMMSS 0x06-YYYY/MM/DD HH:MM:SS
-														      0x07-YYYY-MM-DD HH:MM:SS
+	Input	 : unsigned char 	— ucFormatFlag 输入日期格式: 0x00-YYYYMMDD(8字节) 
+															  0x01-YYYYMM(6字节)
+														      0x02-YYMMDD(6字节)
+														      0x03-YYMM(4字节)
+														      0x04-MMDD(4字节)
+														      0x05-HHMMSS(6字节)
+														      0x06-YYYYMMDDHHMMSS(14字节)
+														      0x07-YYYY/MM/DD HH:MM:SS(19字节)
+														      0x08-YYYY-MM-DD HH:MM:SS(19字节)													      
+														      0x09-HH:MM:SS(8字节)
+														      0x10-YYYYMMDD(4字节)
+															  0x11-YYYYMM(3字节)
+														      0x12-YYMMDD(3字节)
+														      0x13-YYMM(2字节)
+														      0x14-MMDD(2字节)
+														      0x15-HHMMSS(3字节)
+														      0x16-YYYYMMDDHHMMSS(7字节)
 	           unsigned char *	— pucInputDate 输入日期(格式:YYYYMMDD)
 	Output	 : None
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
-								— 失败,返回TOOL_FAILURE(0x01)
+								— 失败,返回相应错误信息(非0)
 	Author	 : Sunrier
 	Date     : 2011-04-21 19:10:22
 	Descp    : 当为MMDD时,不检查年份
@@ -3025,16 +3835,17 @@ EXPORT unsigned char Tool_CheckDateExp(unsigned char *pucInputDateExp);
 	FuncName : Tool_CheckDigital
 	FuncFunc : 检查输入的数据是否为数字字符组成
 	Input	 : unsigned char *	— pucInputData		输入的数据
+	           unsigned char 	— ucFlag			输入数据为空是否支持:0-不支持 1-支持
 	Output	 : None
-	Return	 : unsigned char	— 成功,返回0x00
-					 			— 失败,返回非0
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+					 			— 失败,返回相应错误信息(非0)
 	Author	 : Sunrier
 	Date     : 2011-04-21 19:10:22
 	Descp    : None
 	History  : None
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_CheckDigital(unsigned char *pucInputData);
+EXPORT unsigned char Tool_CheckDigital(unsigned char *pucInputData,unsigned char ucFlag);
 
 /***********************************************************************************************
 	FuncName : Tool_CheckAlpOrDig
@@ -3066,6 +3877,25 @@ EXPORT unsigned char Tool_CheckAlpOrDig(unsigned char *pucInputData);
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_CheckAlpOrDigEx(unsigned char *pucInputData,unsigned char ucSpeCh);
+
+/***********************************************************************************************
+	FuncName : Tool_CheckHex
+	FuncFunc : 检查输入的数据是否为十六进制字符组成
+	Input	 : unsigned char *	— pucInputData,输入的数据
+	           unsigned int		— uiInputDataLen,输入数据的长度
+	           unsigned char 	— ucHexCaseFlag,输入字母是否大小写:0-不检查 1-必须大写 2-必须小写
+	           unsigned char 	— ucNullFlag,输入数据为空是否支持:0-不支持 1-支持
+	Output	 : None
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+					 			— 失败,返回相应错误信息(非0)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : pucInputData='2E3F0103',返回TOOL_SUCCESS
+	           pucInputData='2QDW3DFK',返回TOOL_FAILURE
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_CheckHex(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char ucHexCaseFlag,unsigned char ucNullFlag);
 
 /***********************************************************************************************
 	FuncName : Tool_CheckValidIp
@@ -3148,6 +3978,22 @@ EXPORT unsigned char Tool_CheckAmountWithPoint(unsigned char *pucInputData,unsig
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_CheckFloatZero(float fInputData);
+
+/***********************************************************************************************
+	FuncName : Tool_IsBlankspace
+	FuncFunc : 检查输入的数据是否为只是空格
+	Input	 : unsigned char *	— pucInputData		输入的数据
+	           unsigned char 	— ucFlag			输入数据为空是否支持:0-不支持 1-支持
+	Output	 : None
+	Return	 : unsigned char	— 只是空格,返回TOOL_SUCCESS(0x00)
+					 			— 不只是空格,返回相应错误信息(非0)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_IsBlankspace(unsigned char *pucInputData,unsigned char ucFlag);
 
 /***********************************************************************************************
 	FuncName : Tool_InputText
@@ -3786,6 +4632,68 @@ EXPORT unsigned char Tool_TlvDecode(unsigned char *pucInputData,int iInputDataLe
 EXPORT unsigned char Tool_GetTlvByTag(unsigned char* pucInputData,int iInputDataLen,int iInputTag,TLV *pTlv);
 
 /***********************************************************************************************
+	FuncName : Tool_GetTagInfo
+    FuncFunc : 获取EMV标签信息
+	Input	 : int				— iInputTag输入标签
+	Output	 : TLVTAG_PRM *		— pTlvTag	输出EMV标签信息
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回相应错误信息(非0x00)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetTagInfo(int iInputTag,TLVTAG_PRM *pTlvTag);
+
+/***********************************************************************************************
+	FuncName : Tool_GetTagInfoEx
+    FuncFunc : 获取EMV标签信息
+	Input	 : unsigned char *	— pucInputTag	输入标签
+	           int				— iInputTagLen	输入标签的长度
+	Output	 : TLVTAG_PRM *		— pTlvTag		输出EMV标签信息
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回相应错误信息(非0x00)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetTagInfoEx(unsigned char *pucInputTag,int iInputTagLen,TLVTAG_PRM *pTlvTag);
+
+/***********************************************************************************************
+	FuncName : Tool_CheckTemplateTag
+	FuncFunc : 检查标签是否为模板标签
+	Input	 : unsigned char *	— pucInputTag 	输入的标签
+	           unsigned char 	— ucInputTagLen输入标签的长度
+	Output	 : None
+	Return	 : unsigned char	— 模板标签,返回TOOL_SUCCESS
+					 			— 非模板标签,返回TOOL_FAILURE
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_CheckTemplateTag(unsigned char *pucInputTag,unsigned char ucInputTagLen);
+
+/***********************************************************************************************
+	FuncName : Tool_GetDescpFromApduCode
+    FuncFunc : 获取EMV APDU指令相关返回码描述信息
+	Input	 : unsigned char *	— pucInputApduCode 	输入的返回码
+	Output	 : unsigned char *	— pucOutputDescpInfo 	输出的返回码对应的描述信息
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回相应错误信息(非0x00)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetDescpFromApduCode(unsigned char *pucInputApduCode,unsigned char *pucOutputDescpInfo);
+
+/***********************************************************************************************
 	FuncName : Tool_Des
 	FuncFunc : 对数据进行DES加解密或者3DES加解密或者3倍长密钥DES加解密
 	Input	 : unsigned char 	— ucDesType		DES加解密算法类型：	
@@ -3799,11 +4707,73 @@ EXPORT unsigned char Tool_GetTlvByTag(unsigned char* pucInputData,int iInputData
 								— 失败,返回TOOL_FAILURE(0x01)
 	Author	 : Sunrier
 	Date     : 2011-07-21 19:10:22
-	Descp    : None
+	Descp    : 输入长度必须为8字节
 	History  : None
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_Des(unsigned char ucDesType,unsigned char *pucInputData,unsigned char *pucInputKey,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_DesEx
+	FuncFunc : 对字符串数据进行DES加解密或者3DES加解密或者3倍长密钥DES加解密
+	Input	 : unsigned char 	— ucDesType		DES加解密算法类型：	
+													0表示DES加密数据(Key为8个字节)、1表示DES解密数据(Key为8个字节)、
+													2表示3DES加密数据(Key为16个字节)、3表示3DES解密数据(Key为16个字节)、
+													4表示三倍长密钥加密数据(Key为24个字节)、5表示三倍长密钥解密数据(Key为24个字节)
+			   unsigned char *	— pucInputData		输入的待加密的明文数据/输入的待解密的密文数据
+			   unsigned	int 	— uiInputDataLen	输入数据长度
+			   unsigned char *	— pucInputKey		输入的用作加密的传输密钥/输入的用作解密的传输密钥,字节数必须为8的倍数
+	Output	 : unsigned char *	— pucOutputData	输出的加密后的密文数据/输出的解密后的明文数据(同输入长度)
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 输入/输出长度不限定为8的倍数
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_DesEx(unsigned char ucDesType,unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char *pucInputKey,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_StrDes
+	FuncFunc : 对字符串数据进行DES加解密或者3DES加解密或者3倍长密钥DES加解密
+	Input	 : unsigned char 	— ucDesType		DES加解密算法类型：	
+													0表示DES加密数据(Key为16个字节)、1表示DES解密数据(Key为16个字节)、
+													2表示3DES加密数据(Key为32个字节)、3表示3DES解密数据(Key为32个字节)、
+													4表示三倍长密钥加密数据(Key为48个字节)、5表示三倍长密钥解密数据(Key为48个字节)
+			   unsigned char *	— pucInputData		输入的待加密的明文数据/输入的待解密的密文数据,必须为16字节
+			   unsigned char *	— pucInputKey		输入的用作加密的传输密钥/输入的用作解密的传输密钥,字节数必须为16/32/48
+	Output	 : unsigned char *	— pucOutputData	输出的加密后的密文数据/输出的解密后的明文数据,必须为16字节
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 输入长度必须为16字节字符串数据
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_StrDes(unsigned char ucDesType,unsigned char *pucInputData,unsigned char *pucInputKey,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_StrDesEx
+	FuncFunc : 对字符串数据进行DES加解密或者3DES加解密或者3倍长密钥DES加解密
+	Input	 : unsigned char 	— ucDesType		DES加解密算法类型：	
+													0表示DES加密数据(Key为16个字节)、1表示DES解密数据(Key为16个字节)、
+													2表示3DES加密数据(Key为32个字节)、3表示3DES解密数据(Key为32个字节)、
+													4表示三倍长密钥加密数据(Key为48个字节)、5表示三倍长密钥解密数据(Key为48个字节)
+			   unsigned char *	— pucInputData		输入的待加密的明文数据/输入的待解密的密文数据,必须为8字节
+			   unsigned	int 	— uiInputDataLen	输入数据长度
+			   unsigned char *	— pucInputKey		输入的用作加密的传输密钥/输入的用作解密的传输密钥,字节数必须为16的倍数
+	Output	 : unsigned char *	— pucOutputData	输出的加密后的密文数据/输出的解密后的明文数据(同输入长度)
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 输入长度不限制
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_StrDesEx(unsigned char ucDesType,unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char *pucInputKey,unsigned char *pucOutputData);
 
 /***********************************************************************************************
 	FuncName : Tool_Diversify
@@ -3827,24 +4797,67 @@ EXPORT unsigned char Tool_Diversify(unsigned char *pucInputData,unsigned int uiI
 
 /***********************************************************************************************
 	FuncName : Tool_EcbCbc
-	FuncFunc : DES算法对数据加解密
+	FuncFunc : DES算法ECB或CBC模式对数据加解密
 	Input	 : unsigned	char 	— ucCryptType加解密类型：0表示加密数据、1或其它非0表示解密数据
 			   unsigned	char 	— ucMode加解密模式：0表示ECB模式、1或其它非0表示CBC模式
 			   unsigned	char *	— pucInputData输入数据(输入数据长度必须为8的整数倍,不足需要自行填充)
 			   unsigned	int 	— uiInputDataLen输入数据长度(输入数据长度必须为8的整数倍)
-			   unsigned	char *	— pucInputKey输入密钥(可为8位,16位,24位)支持3密钥
-			   unsigned	char 	— ucInputKeyLen输入密钥长度(必须为8位,16位,24位三个中的一种)
-	Output	 : unsigned char *	— pucOutputData输出数据(8位)
+			   unsigned	char *	— pucInputKey输入密钥(可为8字节/16字节/24字节)支持3密钥
+			   unsigned	char 	— ucInputKeyLen输入密钥长度(必须为8字节/16字节/24字节三个中的一种)
+			   unsigned	char *	— pucInputVector输入icv向量(CBC模式8字节)
+	Output	 : unsigned char *	— pucOutputData输出数据(同输入数据长度)
 	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
 								— 失败,返回TOOL_FAILURE(0x01)
 	Author	 : Sunrier
 	Date     : 2016-12-05 19:00:55
 	Descp    : 一般默认为ECB模式,输入数据不足8的整数倍函数不会自动填充
-	History  : None
-	Other    : X9.52算法为24位密钥
+	History  : CBC模式8字节icv向量如不指定,默认为8字节的0x00
+	Other    : X9.52算法为24字节密钥
 *************************************************************************************************/
 EXPORT unsigned char Tool_EcbCbc(unsigned char ucCryptType,unsigned char ucMode,unsigned char *pucInputData,unsigned int uiInputDataLen,
-			const unsigned char *pucInputKey,const unsigned char ucInputKeyLen,unsigned char *pucOutputData);
+			const unsigned char *pucInputKey,const unsigned char ucInputKeyLen,unsigned char *pucInputVector,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_StrEcbCbc
+	FuncFunc : DES算法ECB或CBC模式对字符串数据加解密
+	Input	 : unsigned	char 	— ucCryptType加解密类型：0表示加密数据、1或其它非0表示解密数据
+			   unsigned	char 	— ucMode加解密模式：0表示ECB模式、1或其它非0表示CBC模式
+			   unsigned	char *	— pucInputData输入数据(输入数据长度必须为16的整数倍,不足需要自行填充)
+			   unsigned	char *	— pucInputKey输入密钥(必须为16位,32位,48位三个中的一种)支持3密钥
+			   unsigned	char *	— pucInputVector输入icv向量(CBC模式16位)
+	Output	 : unsigned char *	— pucOutputData输出数据(16位的整数倍)
+	Return	 : unsigned	char 	— 成功,返回(0x00)
+								— 失败,返回(0x01)
+	Author	 : Sunrier
+    Date     : 2016-12-05 19:00:55
+    Descp    : 一般默认为ECB模式,输入数据不足16的整数倍函数不会自动填充
+	History  : CBC模式16位如不指定,默认为16字节的"0000000000000000"
+	Other    : X9.52算法为48位密钥
+*************************************************************************************************/
+EXPORT unsigned char Tool_StrEcbCbc(unsigned char ucCryptType,unsigned char ucMode,unsigned char *pucInputData,
+			const unsigned char *pucInputKey,unsigned char *pucInputVector,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_EnDeFile
+	FuncFunc : DES/3DES算法对文件加解密
+	Input	 : unsigned	char *	— pcuInputReadFullFileName,输入文件名
+	           unsigned	char *	— pcuInputWriteFullFileName,输出文件名
+	           unsigned char 	— ucDesType,DES加解密算法类型：	
+											 0表示DES加密数据(Key为8个字节)、1表示DES解密数据(Key为8个字节)、
+											 2表示3DES加密数据(Key为16个字节)、3表示3DES解密数据(Key为16个字节)、
+											 4表示三倍长密钥加密数据(Key为24个字节)、5表示三倍长密钥解密数据(Key为24个字节)
+			   unsigned	char *	— pucInputKey输入密钥(32位)
+	Output	 : None
+	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+								   输入参数错误,TOOL_PARAMERROR(0x04)
+	Author	 : Sunrier
+	Date     : 2016-12-05 19:00:55
+	Descp    : 文件名为绝对路径
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_EnDeFile(unsigned char *pcuInputReadFullFileName,char *pcuInputWriteFullFileName,unsigned char ucDesType,unsigned char *pucInputKey);
 
 /***********************************************************************************************
 	FuncName : Tool_GeneraterRsaKey
@@ -3914,7 +4927,7 @@ EXPORT unsigned char Tool_RsaPublicKey(unsigned char ucRsaType,unsigned int uiRS
 	Author	 : Sunrier
 	Date     : 2016-12-05 19:00:55
 	Descp    : 私钥加/解密数据
-	History  : None
+	History  : 私钥加密即私钥签名
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_RsaPrivateKey(unsigned char ucRsaType,unsigned int uiRSABit,
@@ -3929,20 +4942,38 @@ EXPORT unsigned char Tool_RsaPrivateKey(unsigned char ucRsaType,unsigned int uiR
 	unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
 
 /***********************************************************************************************
+	FuncName : Tool_SetMEMILineLen
+	FuncFunc : 设置Base64的MIME型编码每行最长字符数
+	Input	 : int			 	— iMEMILen	输入MIME型编码每行最长字符数
+	Output	 : None
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : MIME友好格式,输出每行默认不超过76字符
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_SetMEMILineLen(int iMEMILen);
+
+/***********************************************************************************************
 	FuncName : Tool_Base64Encrypt
 	FuncFunc : Base64加密数据
 	Input	 : unsigned char *	— pucInputData		输入的数据
 			   int			 	— iInputDataLen	输入的数据长度
-			   unsigned char 	— ucCoderFlag		输入编码编制 0x00或非0x01-基本型编码 0x01-URL和文件名安全型编码
+			   unsigned char 	— ucCoderFlag		输入编码编制:
+			   											0x00-基本型编码(默认)
+			   											0x01-URL和文件名安全型编码
+			   											0x02-MIME型编码
 	Output	 : unsigned char *	— pucOutputData	输出的数据
 			   int	*		 	— piOuputDataLen	输出的数据长度
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
 								— 失败,返回TOOL_FAILURE(0x01)
 	Author	 : Sunrier
 	Date     : 2011-07-21 19:10:22
-	Descp    : Base64编码
-	History  : None
-	Other    : None
+	Descp    : Base64编码(支持GB2312中文)
+	History  : 注意:编码的原始数据如果多次切割处理,输入的每次切割数据长度必须每次为3的倍数长度
+	Other    : 和Tool_Base64Decrypt配合使用
 *************************************************************************************************/
 EXPORT unsigned char Tool_Base64Encrypt(unsigned char *pucInputData,int iInputDataLen,unsigned char ucCoderFlag,unsigned char *pucOutputData,int *piOuputDataLen);
 
@@ -3951,25 +4982,28 @@ EXPORT unsigned char Tool_Base64Encrypt(unsigned char *pucInputData,int iInputDa
 	FuncFunc : Base64解密数据
 	Input	 : unsigned char *	— pucInputData		输入的数据
 			   int			 	— iInputDataLen	输入的数据长度
-			   unsigned char 	— ucCoderFlag		输入编码编制 0x00或非0x01-基本型编码 0x01-URL和文件名安全型编码
+			   unsigned char 	— ucCoderFlag		输入编码编制:
+			   											0x00-基本型编码(默认)
+			                                       		0x01-URL和文件名安全型编码
+			                                       		0x02-MIME型编码
 	Output	 : unsigned char *	— pucOutputData	输出的数据
 			   int	*		 	— piOuputDataLen	输出的数据长度
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
 								— 失败,返回TOOL_FAILURE(0x01)
 	Author	 : Sunrier
 	Date     : 2011-07-21 19:10:22
-	Descp    : Base64解码
+	Descp    : Base64解码(支持GB2312中文)
 	History  : None
-	Other    : None
+	Other    : 和Tool_Base64Encrypt配合使用
 *************************************************************************************************/
 EXPORT unsigned char Tool_Base64Decrypt(unsigned char *pucInputData,int iInputDataLen,unsigned char ucCoderFlag,unsigned char *pucOutputData,int *piOuputDataLen);
 
 /***********************************************************************************************
-	FuncName : Tool_UrlEncode
-	FuncFunc : 使用 URL base64 编码方案
+	FuncName : Tool_Base64UrlEncode
+	FuncFunc : 使用URL base64编码方案
 	Input	 : unsigned char *	— pucInputData		输入的数据
 			   int			 	— iInputDataLen	输入的数据长度
-			   const int		— iMaxSize			输出的长度最大BUFFER空间
+			   int	*			— piOuputDataLen	输出的长度最大BUFFER空间
 	Output	 : unsigned char *	— pucOutputData	输出的数据
 			   int	*		 	— piOuputDataLen	输出的数据长度
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
@@ -3977,10 +5011,431 @@ EXPORT unsigned char Tool_Base64Decrypt(unsigned char *pucInputData,int iInputDa
 	Author	 : Sunrier
 	Date     : 2011-07-21 19:10:22
 	Descp    : 特殊字符处理格式:字符%+HEX 如等号=(%3D)
+	History  : 字符’a’-‘z’,’A’-‘Z’,’0’-‘9’,'.','-','_','*'和'/'都不被编码,维持原值;
+			   空格' '被转换为加号'+'
+			   其他每个字节都被表示成"%XY"的格式,X和Y分别代表一个十六进制位,编码为UTF-8
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_Base64UrlEncode(unsigned char* pucInputData,int iInputDataLen,unsigned char* pucOutputData,int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_Base64Encode
+	FuncFunc : Base64编码
+	Input	 : unsigned char *	— pucInputData		输入的数据
+			   int			 	— iInputDataLen	输入的数据长度
+			   unsigned char 	— ucCoderFlag		输入编码编制:
+			   											0x00-基本型编码(默认)
+			   											0x01-URL和文件名安全型编码
+			   											0x02-MIME型编码		
+			   int *			— piOuputDataLen	输出的长度最大BUFFER空间
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+			   int *		 	— piOuputDataLen	输出的数据长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : Base64编码(支持UTF-8中文)
+	History  : 注意:编码的原始数据如果多次切割处理,输入的每次切割数据长度必须每次为3的倍数长度
+	Other    : 和Tool_Base64Decode配合使用
+*************************************************************************************************/
+EXPORT unsigned char Tool_Base64Encode(unsigned char *pucInputData,int iInputDataLen,unsigned char ucCoderFlag,
+										unsigned char *pucOutputData,int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_Base64Decode
+	FuncFunc : Base64解码
+	Input	 : unsigned char *	— pucInputData		输入的数据
+			   int			 	— iInputDataLen	输入的数据长度
+			   unsigned char 	— ucCoderFlag		输入编码编制:
+			   											0x00-基本型编码(默认)
+			   											0x01-URL和文件名安全型编码
+			   											0x02-MIME型编码		
+			   int *			— piOuputDataLen	输出的长度最大BUFFER空间
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+			   int *		 	— piOuputDataLen	输出的数据长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : Base64解码(支持UTF-8中文)
+	History  : None
+	Other    : 和Tool_Base64Encode配合使用
+*************************************************************************************************/
+EXPORT unsigned char Tool_Base64Decode(unsigned char *pucInputData,int iInputDataLen,unsigned char ucCoderFlag,
+										unsigned char *pucOutputData,int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_UrlEncode
+	FuncFunc : 使用URL编码方案
+	Input	 : unsigned char *	— pucInputData		输入的数据
+			   int			 	— iInputDataLen	输入的数据长度
+			   unsigned char 	— ucUrlCode		输入URL编码的方式:0-encodeURI 非0-encodeURIComponent
+			   int	*			— piOuputDataLen	输出的长度最大BUFFER空间
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+			   int	*		 	— piOuputDataLen	输出的数据长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 除字母和数字以及/.外作为特殊字符处理,格式:字符%+HEX 如等号=(%3D)
+	           字符’a’-‘z’,’A’-‘Z’,’0’-‘9’,'.','-','_','*','!','~','(',')','''都不被编码,维持原值;
+	           特殊含义9个符号.-_*!~()'不进行编码
+			   这里空格' '不会被转换为加号'+'
+			   其他每个字节都被表示成"%XY"的格式,X和Y分别代表一个十六进制位,编码为UTF-8
+	History  : encodeURI()着眼于对整个URL进行编码,特殊含义10个符号:/?&@;,=+#不进行编码
+			   encodeURIComponent()对URL的组成部分进行个别编码,所以:/?&@;,=+#在这里是可以进行编码
+	Other    : 和Tool_UrlDecode配合使用
+*************************************************************************************************/
+EXPORT unsigned char Tool_UrlEncode(unsigned char* pucInputData,int iInputDataLen,unsigned char ucUrlCode,unsigned char* pucOutputData,int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_UrlDecode
+	FuncFunc : 使用URL解码方案
+	Input	 : unsigned char *	— pucInputData		输入的数据
+			   int			 	— iInputDataLen	输入的数据长度
+			   int	*			— piOuputDataLen	输出的长度最大BUFFER空间
+	Output	 : unsigned char *	— pucOutputData	输出的数据
+			   int	*		 	— piOuputDataLen	输出的数据长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+								— 输入参数有误,返回TOOL_PARAMERROR(0x05)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 除字母和数字以及/.外作为特殊字符处理,格式:字符%+HEX 如等号=(%3D)
+	History  : None
+	Other    : 和Tool_UrlEncode配合使用
+*************************************************************************************************/
+EXPORT unsigned char Tool_UrlDecode(unsigned char* pucInputData,int iInputDataLen,unsigned char* pucOutputData,int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_ChineseToUnicode
+	FuncFunc : 中文编码转换为UNICODE
+	Input	 : unsigned char *	— pucInputData		输入的中文编码
+	           unsigned char 	— ucConvFlag		输入转换后的格式标志:
+	                                                 	0-简写格式(不带\u打头)  
+	                                                	1-完整格式(带\u打头)
+	Output	 : unsigned char *	— pucOutputData	输出的UNICODE编码
+			   int	*		 	— piOuputDataLen	输出的数据长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如输入"中国",ucConvFlag=0,输出0x34 0x45 0x32 0x44 0x35 0x36 0x46 0x44,*piOuputDataLen = 8
+    		   如输入"华伟",ucConvFlag=0,输出0x35 0x33 0x34 0x45 0x34 0x46 0x31 0x46,*piOuputDataLen = 8
+    		   如输入"王文兵",ucConvFlag=0,输出0x37 0x33 0x38 0x42 0x36 0x35 0x38 0x37 0x35 0x31 0x37 0x35,*piOuputDataLen = 12
+    		   如输入"中国123",ucConvFlag=0,输出0x34 0x45 0x32 0x44 0x35 0x36 0x46 0x44 0x00 0x31 0x00 0x32 0x00 0x33,*piOuputDataLen = 20
+    		   如输入"中国123",ucConvFlag=1,输出0x5C 0x75 0x34 0x45 0x32 0x44 0x5C 0x75 0x35 0x36 0x46 0x44 0x5C 0x75 0x00 0x31 
+    		   0x5C 0x75 0x00 0x32 0x5C 0x75 0x00 0x33,*piOuputDataLen = 30
+    		   0x5C 0x75 0x34 0x45 0x32 0x44 0x5C 0x75 0x35 0x36 0x46 0x44 0x5C 0x75 0x00 0x31 0x5C 0x75 0x00 0x32 0x5C 0x75 0x00 0x33
+    		   (即字符串\u4E2D\u56FD\u0031\u0032\u0033)
+	History  : 当ucConvFlag=0时,输出格式XXXX形式;
+			   当ucConvFlag不为0时,输出格式\uXXXX形式;
+	Other    : 和Tool_UnicodeToChinese配合使用
+*************************************************************************************************/
+EXPORT unsigned char Tool_ChineseToUnicode(unsigned char *pucInputData,unsigned char ucConvFlag,unsigned char *pucOutputData, int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_UnicodeToChinese
+	FuncFunc : 将UNICODE转换为中文编码
+	Input	 : unsigned char *	— pucInputData,输入的UNICODE编码
+	           unsigned char 	— ucConvFlag  ,输入数据格式标志:
+	                                                 	0-简写格式(不带\u打头)  
+	                                                	1-完整格式(带\u打头)
+	Output	 : unsigned char *	— pucOutputData,输出的中文GB2312编码
+			   int	*		 	— piOuputDataLen,输出中文GB2312编码的长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如输入0x34 0x45 0x32 0x44 0x35 0x36 0x46 0x44,输出"中国"(0xD6 0xD0 0xB9 0xFA),*piOuputDataLen = 4
+    		   如输入0x35 0x33 0x34 0x45 0x34 0x46 0x31 0x46,输出"华伟"(0xBB 0xAA 0xCE 0xB0),*piOuputDataLen = 4
+    		   如输入0x37 0x33 0x38 0x42 0x36 0x35 0x38 0x37 0x35 0x31 0x37 0x35,输出"王文兵"(0xCD 0xF5 0xCE 0xC4 0xB1 0xF8),*piOuputDataLen = 6
+	History  : Unicode只是一个符号集,它只规定了符号的二进制代码,却没有规定这个二进制代码应该如何存储;
+	           如果有一种编码能将世界上所有的符号都纳入其中,
+	           也就是说每一个符号都有一个独一无二的编码那么乱码问题就会消失,这就是Unicode(统一码);
+	           互联网的普及强烈要求出现一种统一的编码方式,
+	           UTF-8就是在互联网上使用最广的一种Unicode的实现方式,
+	           其他实现方式还包括UTF-16(字符用两个字节或四个字节表示)和
+	           UTF-32(字符用四个字节表示)当然这些在互联网几乎不用我们不用关心;
+	           重复一遍,这里的关系是UTF-8是Unicode的实现方式之一;
+      		   UTF-8最大的一个特点:它是一种变长的编码方式,它可以使用1~4个字节表示一个符号,
+      		   根据不同的符号而变化字节长度,UTF-8的编码规则很简单,只有如下二条:
+			   1)对于单字节的符号,字节的第1位设为0,后面7位为这个符号的 Unicode码,
+			     因此对于英语字母UTF-8编码和ASCII码是相同的;
+			   2)对于n字节的符号(n>1),第1个字节的前n位都设为1,第n + 1位设为0,
+			     后面字节的前两位一律设为10,剩下的没有提及的二进制位,全部为这个符号的Unicode码;
+			   当ucConvFlag=0时,输入格式XXXX形式;
+			   当ucConvFlag不为0时,输入格式\uXXXX形式;
+	Other    : 和Tool_ChineseToUnicode配合使用
+*************************************************************************************************/
+EXPORT unsigned char Tool_UnicodeToChinese(unsigned char *pucInputData,unsigned char ucConvFlag,unsigned char *pucOutputData, int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_ChineseToGB2312
+	FuncFunc : 中文编码转换为GB2312十六进数
+	Input	 : unsigned char *	— pucInputData,输入的中文编码
+	Output	 : unsigned char *	— pucOutputData,输出的十六进数字符串
+			   int	*		 	— piOuputDataLen,输出十六进数字符串的长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如输入"中国",输出0xD6 0xD0 0xB9 0xFA,*piOuputDataLen = 4
+    		   如输入"华伟",输出0xBB 0xAA 0xCE 0xB0,*piOuputDataLen = 4
+    		   如输入"王文兵",输出0xCD 0xF5 0xCE 0xC4 0xB1 0xF8,*piOuputDataLen = 6
+	History  : 为使计算机支持更多语言,通常使用0x80~0xFF范围的2个字节来表示1个字符,
+			   比如:汉字'中'在中文操作系统中,使用[0xD6,0xD0]这两个字节存储;
+　　		   不同的国家和地区制定了不同的标准,由此产生了GB2312,BIG5,JIS等各自的编码标准;
+               这些使用2个字节来代表一个字符的各种汉字延伸编码方式,称为ANSI编码;
+               在简体中文系统下ANSI编码代表GB2312编码,在日文操作系统下ANSI编码代表JIS编码;
+	           1980年中国发布了第一个汉字编码标准,也即GB2312,全称<<信息交换用汉字编码字符集.基本集>>,
+			   通常简称GB("国标"汉语拼音首字母),共收录了6763个常用的汉字和字符,
+			   此标准于次年5月实施,它满足了日常99%汉字的使用需求;
+	           GBK是国家标准GB2312基础上扩容后兼容GB2312的标准;
+	           GBK的文字编码是用双字节来表示的,即不论中、英文字符均使用双字节来表示,
+	           为了区分中文,将其最高位都设定成1;
+	           GBK包含全部中文字符,是国家编码,通用性比UTF8差,不过UTF8占用的数据库比GBD大;
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_ChineseToGB2312(unsigned char *pucInputData,unsigned char *pucOutputData, int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_ChineseToGB2312Str
+	FuncFunc : 中文编码转换为GB2312十六进数字符串
+	Input	 : unsigned char *	— pucInputData,输入的中文编码
+	Output	 : unsigned char *	— pucOutputData,输出的十六进数字符串
+			   int	*		 	— piOuputDataLen,输出十六进数字符串的长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如输入"中国",输出0x44 0x36 0x44 0x30 0x42 0x39 0x46 0x41(D6D0B9FA),*piOuputDataLen = 8
+    		   如输入"华伟",输出0x42 0x42 0x41 0x41 0x43 0x45 0x42 0x30(BBAACEB0),*piOuputDataLen = 8
+    		   如输入"王文兵",输出0x43 0x44 0x46 0x35 0x43 0x45 0x43 0x34 0x42 0x31 0x46 0x38(CDF5CEC4B1F8),*piOuputDataLen = 12
+	History  : 为使计算机支持更多语言,通常使用0x80~0xFF范围的2个字节来表示1个字符,
+			   比如:汉字'中'在中文操作系统中,使用[0xD6,0xD0]这两个字节存储;
+　　		   不同的国家和地区制定了不同的标准,由此产生了GB2312,BIG5,JIS等各自的编码标准;
+               这些使用2个字节来代表一个字符的各种汉字延伸编码方式,称为ANSI编码;
+               在简体中文系统下ANSI编码代表GB2312编码,在日文操作系统下ANSI编码代表JIS编码;
+	           1980年中国发布了第一个汉字编码标准,也即GB2312,全称<<信息交换用汉字编码字符集.基本集>>,
+			   通常简称GB("国标"汉语拼音首字母),共收录了6763个常用的汉字和字符,
+			   此标准于次年5月实施,它满足了日常99%汉字的使用需求;
+	           GBK是国家标准GB2312基础上扩容后兼容GB2312的标准;
+	           GBK的文字编码是用双字节来表示的,即不论中、英文字符均使用双字节来表示,
+	           为了区分中文,将其最高位都设定成1;
+	           GBK包含全部中文字符,是国家编码,通用性比UTF8差,不过UTF8占用的数据库比GBD大;
+	Other    : 和Tool_GB2312StrToChinese配合使用
+*************************************************************************************************/
+EXPORT unsigned char Tool_ChineseToGB2312Str(unsigned char *pucInputData,unsigned char *pucOutputData, int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_GB2312StrToChinese
+	FuncFunc : 将GB2312转换为中文编码
+	Input	 : unsigned char *	— pucInputData,输入的UNICODE编码
+	Output	 : unsigned char *	— pucOutputData,输出的中文GB2312编码
+			   int	*		 	— piOuputDataLen,输出中文GB2312编码的长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如 输入0x44 0x36 0x44 0x30 0x42 0x39 0x46 0x41,输出"中国"(0xD6 0xD0 0xB9 0xFA),*piOuputDataLen = 4
+    		   如 输入0x42 0x42 0x41 0x41 0x43 0x45 0x42 0x30,输出"华伟"(0xBB 0xAA 0xCE 0xB0),*piOuputDataLen = 4
+    		   如 输入0x43 0x44 0x46 0x35 0x43 0x45 0x43 0x34 0x42 0x31 0x46 0x38,输出"王文兵"(0xCD 0xF5 0xCE 0xC4 0xB1 0xF8),*piOuputDataLen = 6
+	History  : 为使计算机支持更多语言,通常使用0x80~0xFF范围的2个字节来表示1个字符,
+			   比如:汉字'中'在中文操作系统中,使用[0xD6,0xD0]这两个字节存储;
+　　		   不同的国家和地区制定了不同的标准,由此产生了GB2312,BIG5,JIS等各自的编码标准;
+               这些使用2个字节来代表一个字符的各种汉字延伸编码方式,称为ANSI编码;
+               在简体中文系统下ANSI编码代表GB2312编码,在日文操作系统下ANSI编码代表JIS编码;
+	           1980年中国发布了第一个汉字编码标准,也即GB2312,全称<<信息交换用汉字编码字符集.基本集>>,
+			   通常简称GB("国标"汉语拼音首字母),共收录了6763个常用的汉字和字符,
+			   此标准于次年5月实施,它满足了日常99%汉字的使用需求;
+	           GBK是国家标准GB2312基础上扩容后兼容GB2312的标准;
+	           GBK的文字编码是用双字节来表示的,即不论中、英文字符均使用双字节来表示,
+	           为了区分中文,将其最高位都设定成1;
+	           GBK包含全部中文字符,是国家编码,通用性比UTF8差,不过UTF8占用的数据库比GBD大;
+	Other    : 和Tool_ChineseToGB2312Str配合使用
+*************************************************************************************************/
+EXPORT unsigned char Tool_GB2312StrToChinese(unsigned char *pucInputData,unsigned char *pucOutputData, int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_Utf8ToGB2312
+	FuncFunc : 将UTF8转换为GB2312
+	Input	 : unsigned char *	— pucInputData,输入的UTF8编码
+	Output	 : unsigned char *	— pucOutputData,输出的GB2312编码
+			   int	*		 	— piOuputDataLen,输出GB2312编码的长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如输入0xE4 0xB8 0xAD 0xE5 0x9B 0xBD,输出"中国"(0xD6 0xD0 0xB9 0xFA),*piOuputDataLen = 4
+    		   如输入0xE5 0x8D 0x8E 0xE4 0xBC 0x9F,输出"华伟"(0xBB 0xAA 0xCE 0xB0),*piOuputDataLen = 4
+    		   如输入0xE7 0x8E 0x8B 0xE6 0x96 0x87 0xE5 0x85 0xB5,输出"王文兵"(0xCD 0xF5 0xCE 0xC4 0xB1 0xF8),*piOuputDataLen = 6
+	History  : Unicode只是一个符号集,它只规定了符号的二进制代码,却没有规定这个二进制代码应该如何存储;
+	           如果有一种编码能将世界上所有的符号都纳入其中,
+	           也就是说每一个符号都有一个独一无二的编码那么乱码问题就会消失,这就是 Unicode(统一码);
+	           互联网的普及强烈要求出现一种统一的编码方式,
+	           UTF-8就是在互联网上使用最广的一种Unicode的实现方式,
+	           其他实现方式还包括UTF-16(字符用两个字节或四个字节表示)和
+	           UTF-32(字符用四个字节表示)当然这些在互联网几乎不用我们不用关心;
+	           重复一遍,这里的关系是UTF-8是Unicode的实现方式之一;
+      		   UTF-8最大的一个特点:它是一种变长的编码方式,它可以使用1~4个字节表示一个符号,
+      		   根据不同的符号而变化字节长度,UTF-8的编码规则很简单,只有如下二条:
+			   1)对于单字节的符号,字节的第1位设为0,后面7位为这个符号的 Unicode码,
+			     因此对于英语字母UTF-8编码和ASCII码是相同的;
+			   2)对于n字节的符号(n>1),第1个字节的前n位都设为1,第n + 1位设为0,
+			     后面字节的前两位一律设为10,剩下的没有提及的二进制位,全部为这个符号的Unicode码;
+	Other    : 和Tool_GB2312ToUtf8配合使用
+*************************************************************************************************/
+EXPORT unsigned char Tool_Utf8ToGB2312(unsigned char *pucInputData,unsigned char *pucOutputData, int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_GB2312ToUtf8
+	FuncFunc : 将GB2312转换为UTF8
+	Input	 : unsigned char *	— pucInputData,输入的GB2312编码
+	Output	 : unsigned char *	— pucOutputData,输出的UTF8编码
+			   int	*		 	— piOuputDataLen,输出UTF8编码的长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-07-21 19:10:22
+	Descp    : 如输入"中国"(0xD6 0xD0 0xB9 0xFA),输出0xE4 0xB8 0xAD 0xE5 0x9B 0xBD,*piOuputDataLen = 6
+    		   如输入"华伟"(0xBB 0xAA 0xCE 0xB0),输出0xE5 0x8D 0x8E 0xE4 0xBC 0x9F,*piOuputDataLen = 6
+    		   如输入"王文兵"(0xCD 0xF5 0xCE 0xC4 0xB1 0xF8),输出0xE7 0x8E 0x8B 0xE6 0x96 0x87 0xE5 0x85 0xB5,*piOuputDataLen = 9
+	History  : Unicode只是一个符号集,它只规定了符号的二进制代码,却没有规定这个二进制代码应该如何存储;
+	           如果有一种编码能将世界上所有的符号都纳入其中,
+	           也就是说每一个符号都有一个独一无二的编码那么乱码问题就会消失,这就是 Unicode(统一码);
+	           互联网的普及强烈要求出现一种统一的编码方式,
+	           UTF-8就是在互联网上使用最广的一种Unicode的实现方式,
+	           其他实现方式还包括UTF-16(字符用两个字节或四个字节表示)和
+	           UTF-32(字符用四个字节表示)当然这些在互联网几乎不用我们不用关心;
+	           重复一遍,这里的关系是UTF-8是Unicode的实现方式之一;
+      		   UTF-8最大的一个特点:它是一种变长的编码方式,它可以使用1~4个字节表示一个符号,
+      		   根据不同的符号而变化字节长度,UTF-8的编码规则很简单,只有如下二条:
+			   1)对于单字节的符号,字节的第1位设为0,后面7位为这个符号的 Unicode码,
+			     因此对于英语字母UTF-8编码和ASCII码是相同的;
+			   2)对于n字节的符号(n>1),第1个字节的前n位都设为1,第n + 1位设为0,
+			     后面字节的前两位一律设为10,剩下的没有提及的二进制位,全部为这个符号的Unicode码;
+	Other    : 和Tool_Utf8ToGB2312配合使用
+*************************************************************************************************/
+EXPORT unsigned char Tool_GB2312ToUtf8(unsigned char *pucInputData,unsigned char *pucOutputData, int *piOuputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_GetCrc8
+    FuncFunc : 计算CRC8
+	Input	 : unsigned char *	— pucInputData		输入需要计算的数据
+			   unsigned int		— uiInputDataLen	输入数据长度
+			   unsigned char 	— ucCrc8Type		输入哈希类型:
+			   												0x01-CRC8
+			   												0x02-自定义客户化CRC8
+	Output	 : unsigned char *	— pucOutputData	输出计算结果:
+															0x01-CRC8输出1个字节
+															0x02-CRC8输出1个字节
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回相应错误信息(非0)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
 	History  : None
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_UrlEncode(unsigned char* pucInputData,int iInputDataLen,const int iMaxSize,unsigned char* pucOutputData,int *piOuputDataLen);
+EXPORT unsigned char Tool_GetCrc8(unsigned char* pucInputData,unsigned int uiInputDataLen,unsigned char ucCrc8Type,unsigned char *pucOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_GetCrc16
+    FuncFunc : 计算CRC16
+	Input	 : unsigned char *	— pucInputData		输入需要计算的数据
+			   unsigned int		— uiInputDataLen	输入数据长度
+			   unsigned char 	— ucCrc16Type		输入CRC类型(参考枚举类型CRC_MODE):
+			   												CRC16_IBM:CRC_MODE_CRC16_IBM
+			   												CRC16_MAXIM:CRC_MODE_CRC16_MAXIM
+			   												CRC16_USB:CRC_MODE_CRC16_USB
+			   												CRC16_MODBUS:CRC_MODE_CRC16_MODBUS
+			   												CRC16_CCITT:CRC_MODE_CRC16_CCITT
+			   												CRC16_CCITT_FALSE:CRC_MODE_CRC16_CCITT_FALSE
+			   												CRC16_X25:CRC_MODE_CRC16_X25
+			   												CRC16_XMODEM:CRC_MODE_CRC16_XMODEM
+			   												CRC16_DNP:CRC_MODE_CRC16_DNP 												
+	Output	 : unsigned short *	— pusOutputData	输出计算结果
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回相应错误信息(非0)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetCrc16(unsigned char* pucInputData,unsigned int uiInputDataLen,unsigned char ucCrc16Type,unsigned short *pusOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_GetCrc
+    FuncFunc : 计算CRC循环冗余校验码
+	Input	 : CRC_TYPE			— crcType,输入CRC类型结构信息
+	           const uint8_t *	— buffer,输入需要计算的数据
+			   uint32_t			— length,输入需要计算的数据长度
+	Output	 : uint32_t*		— puiOutputData,输出CRC循环冗余校验码
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回相应错误信息(非0x00)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : 支持CRC1-CRC32
+	History  : 通用CRC算法
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetCrc(CRC_TYPE crcType, unsigned char* pucInputData,unsigned int uiInputDataLen, uint32_t *puiOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_GetGeneralCrc
+    FuncFunc : 计算通用CRC算法循环冗余校验码
+	Input	 : unsigned char 	— ucCrc16Type		输入CRC类型(参考枚举类型CRC_MODE):
+			   												CRC4_ITU:CRC_MODE_CRC4_ITU
+			   												CRC5_EPC:CRC_MODE_CRC5_EPC
+			   												CRC5_ITU:CRC_MODE_CRC5_ITU
+			   												CRC5_USB:CRC_MODE_CRC5_USB
+			   												CRC6_ITU:CRC_MODE_CRC6_ITU
+			   												CRC7_MMC:CRC_MODE_CRC7_MMC
+			   												CRC8:CRC_MODE_CRC8
+			   												CRC8_ITU:CRC_MODE_CRC8_ITU
+			   												CRC8_ROHC:CRC_MODE_CRC8_ROHC
+			   												CRC8_MAXIM:CRC_MODE_CRC8_MAXIM
+			   												CRC16_IBM:CRC_MODE_CRC16_IBM
+			   												CRC16_MAXIM:CRC_MODE_CRC16_MAXIM
+			   												CRC16_USB:CRC_MODE_CRC16_USB
+			   												CRC16_MODBUS:CRC_MODE_CRC16_MODBUS
+			   												CRC16_CCITT:CRC_MODE_CRC16_CCITT
+			   												CRC16_CCITT_FALSE:CRC_MODE_CRC16_CCITT_FALSE
+			   												CRC16_X25:CRC_MODE_CRC16_X25
+			   												CRC16_XMODEM:CRC_MODE_CRC16_XMODEM
+			   												CRC16_DNP:CRC_MODE_CRC16_DNP
+			   												CRC32:CRC_MODE_CRC32
+			   												CRC32_MPEG2:CRC_MODE_CRC32_MPEG2			   												
+	           unsigned char *	— pucInputData		输入需要计算的数据
+			   unsigned int		— uiInputDataLen	输入数据长度			   
+	Output	 : uint32_t*		— puiOutputData,输出CRC循环冗余校验码
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回相应错误信息(非0x00)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : 支持CRC4/CRC5/CRC6/CRC7/CRC8/CRC16/CRC32
+	History  : 常用的CRC算法
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetGeneralCrc(unsigned char ucCrc16Type,unsigned char* pucInputData,unsigned int uiInputDataLen,uint32_t *puiOutputData);
+
+/***********************************************************************************************
+	FuncName : Tool_GetDescpFromCrcMode
+	FuncFunc : 通过CRC模型类型获取相关信息描述
+	Input	 : unsigned char	— ucCrcMode 	 输入的CRC模型类型
+	Output	 : unsigned char *	— pucOutputData 输出的相关CRC模型类型对应描述信息
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+					 			— 失败,返回TOOL_FAILURE(0x01)
+					 			— 输入参数有误,返回TOOL_PARAMERROR(0x05)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : 获取CRC模型类型相关信息描述
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetDescpFromCrcMode(unsigned char ucCrcMode,unsigned char *pucOutputData);
 
 /***********************************************************************************************
 	FuncName : Tool_Hash
@@ -4015,31 +5470,72 @@ EXPORT unsigned char Tool_Hash(unsigned char* pucInputData,int iInputDataLen,uns
 /***********************************************************************************************
 	FuncName : Tool_FileHash
     FuncFunc : 计算文件哈希值
-	Input	 : unsigned char *	— pucFileName		输入进行计算的文件名(绝对路径)
-	           unsigned char 	— ucHashType		输入哈希类型:
+	Input	 : unsigned char *	— pucFileName				输入进行计算的文件名(绝对路径)
+	           unsigned char 	— ucHashType				输入哈希类型:
 	                                                        0x01-MD5 
 	                                                        0x02-SHA1 
 	                                                        0x03-SHA224 
 	                                                        0x04-SHA256
 	                                                        0x05-SHA384
 	                                                        0x06-SHA512
-	Output	 : unsigned char *	— pucOutputData	输出计算结果:
+	           unsigned char 	— ucTrimFileTailHashFlag	输入文件末尾哈希值是否剔除:
+	                                      					0x00-不剔除
+	                                      					0x01-不剔除并计算追加到文件尾
+	                                                        0x02-剔除计算 
+	                                                        0x03-剔除计算并比较 
+	                                                        其他-剔除计算
+	Output	 : unsigned char *	— pucOutputData			输出计算结果:
 	                                                        0x01-MD5输出16个字节 
 	                                                        0x02-SHA1输出20个字节 
 	                                                        0x03-SHA224输出28个字节 
 	                                                        0x04-SHA256输出32个字节
 	                                                        0x05-SHA384输出48个字节 
 	                                                        0x06-SHA512输出64个字节
-	           unsigned int *	— puiOutputDataLen	输出计算结果长度
+	           unsigned int *	— puiOutputDataLen			输出计算结果长度
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
 								— 失败,返回相应错误信息(非0)
     Author	 : Sunrier
     Date     : 2016-12-23 10:10:22
-    Descp    : None
-	History  : None
+    Descp    : 输入文件名
+	History  : 如果文件末尾带有哈希值,计算时可以通过设置ucTrimFileTailHashFlag计算
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_FileHash(unsigned char *pucFileName,unsigned char ucHashType,unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
+EXPORT unsigned char Tool_FileHash(unsigned char *pucFileName,unsigned char ucHashType,unsigned char ucTrimFileTailHashFlag,unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_FilePointHash
+    FuncFunc : 计算文件哈希值
+	Input	 : FILE *			— fpHash					输入计算的哈希文件指针
+	           unsigned char 	— ucHashType				输入哈希类型:
+	                                                        0x01-MD5 
+	                                                        0x02-SHA1 
+	                                                        0x03-SHA224 
+	                                                        0x04-SHA256
+	                                                        0x05-SHA384
+	                                                        0x06-SHA512
+	           unsigned char 	— ucTrimFileTailHashFlag	输入文件末尾哈希值是否剔除:
+	           												0x00-不剔除
+	           												0x01-不剔除并计算追加到文件尾
+	                                                        0x02-剔除计算 
+	                                                        0x03-剔除计算并比较 
+	                                                        其他-剔除计算
+	Output	 : unsigned char *	— pucOutputData			输出计算结果:
+	                                                        0x01-MD5输出16个字节 
+	                                                        0x02-SHA1输出20个字节 
+	                                                        0x03-SHA224输出28个字节 
+	                                                        0x04-SHA256输出32个字节
+	                                                        0x05-SHA384输出48个字节 
+	                                                        0x06-SHA512输出64个字节
+	           unsigned int *	— puiOutputDataLen			输出计算结果长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回相应错误信息(非0)
+    Author	 : Sunrier
+    Date     : 2016-12-23 10:10:22
+    Descp    : 输入文件指针
+	History  : 如果文件末尾带有哈希值,计算时可以通过设置ucTrimFileTailHashFlag计算
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_FilePointHash(FILE *fpHash,unsigned char ucHashType,unsigned char ucTrimFileTailHashFlag,unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
 
 /***********************************************************************************************
 	FuncName : Tool_CodeConvert
@@ -4179,15 +5675,17 @@ EXPORT unsigned char Tool_GetCfgFile(unsigned char *pucOutputCfgFileName);
 								— 失败,返回TOOL_FAILURE(0x01)
 	Author	 : Sunrier
 	Date     : 2013-12-24 19:10:22
-	Descp    : 绝对路径(全路径)
-	History  : None
-	Other    : uiMaxLen太小无法保存绝对路径地址，返回 NULL 
+	Descp    : 绝对路径(全路径,不包含应用名称),如快捷方式运行的绝对路径(不包含应用名称)
+	History  : uiMaxLen太小无法保存绝对路径地址,返回NULL 
+	Other    : 如应用实际路径为:G:\App\Test\Release\Test.exe,
+	             应用快捷方式实际路径为:C:\Users\Administrator\Desktop\Test.exe,
+	             执行返回:C:\Users\Administrator\Desktop
 *************************************************************************************************/
 EXPORT unsigned char Tool_GetCurrPathFile(unsigned int uiMaxLen,unsigned char *pucOuputFilePathName);
 
 /***********************************************************************************************
 	FuncName : Tool_GetCurrAppPathFile
-	FuncFunc : 获取当前应用执行的目录全路径
+	FuncFunc : 获取当前应用执行的目录全路径(包含应用名称)
 	Input	 : unsigned int		— uiMaxLen,当前目录的绝对路径地址长度大小
 	Output	 : unsigned char *	— pucOuputAppPathName,输出文件的全路径
 	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
@@ -4195,10 +5693,29 @@ EXPORT unsigned char Tool_GetCurrPathFile(unsigned int uiMaxLen,unsigned char *p
 	Author	 : Sunrier
 	Date     : 2013-12-24 19:10:22
 	Descp    : 绝对路径包含应用名称(全路径)
-	History  : None
-	Other    : uiMaxLen太小无法保存绝对路径地址
+	History  : uiMaxLen太小无法保存绝对路径地址
+	Other    : 如应用实际路径为:G:\App\Test\Release\Test.exe,
+	             应用快捷方式实际路径为:C:\Users\Administrator\Desktop\Test.exe,
+	             执行返回:G:\App\Test\Release\Test.exe
 *************************************************************************************************/
 EXPORT unsigned char Tool_GetCurrAppPathFile(unsigned int uiMaxLen,unsigned char *pucOuputAppPathName);
+
+/***********************************************************************************************
+	FuncName : Tool_GetCurrAppPath
+	FuncFunc : 获取当前应用执行的目录全路径(不包含应用名称)
+	Input	 : unsigned int		— uiMaxLen,当前目录的绝对路径地址长度大小
+	Output	 : unsigned char *	— pucOuputAppPath,输出文件的全路径
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2013-12-24 19:10:22
+	Descp    : 绝对路径不包含应用名称(全路径)
+	History  : uiMaxLen太小无法保存绝对路径地址
+	Other    : 如应用实际路径为:G:\App\Test\Release\Test.exe,
+	             应用快捷方式实际路径为:C:\Users\Administrator\Desktop\Test.exe,
+	             执行返回:G:\App\Test\Release\
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetCurrAppPath(unsigned int uiMaxLen,unsigned char *pucOuputAppPath);
 
 /***********************************************************************************************
 	FuncName : Tool_GetPathName
@@ -4230,6 +5747,55 @@ EXPORT unsigned char Tool_GetPathName(unsigned char *pucInputFullPathName,unsign
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_GetFileName(unsigned char *pucInputFullPathName,unsigned char *pucOutputFileName);
+
+/***********************************************************************************************
+	FuncName : Tool_GetFileNamePrefix
+	FuncFunc : 获取文件名的前缀
+	Input	 : unsigned char *	— pucInputFileName			输入文件名
+	           unsigned char 	— ucSuffixFlag				输入是否指定文件名的后缀:
+	                                                        0-不查找后缀以第一个.之前为前缀
+	                                                        1-不查找后缀以第一个.之前为前缀
+	                                                        2-不查找后缀以最后一个.之前为前缀
+	                                                        3-查找后缀,不匹配时以第一个.之前为前缀
+	                                                        4-查找后缀,不匹配时以最后一个.之前为前缀
+	                                                        5-查找后缀且必须匹配
+	           unsigned char *	— pucInputSuffix			输入指定的文件名后缀
+	Output	 : unsigned char *	— pucOutputPrefix			输出文件名的前缀
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 其他错误,返回TOOL_FAILURE(0x01)
+								— 输入参数有误,返回TOOL_PARAMERROR(0x05)
+	Author	 : Sunrier
+	Date     : 2013-12-24 19:10:22
+	Descp    : 绝对路径或相对路径,此函数不检查文件是否已经存在
+	History  : 如:
+	           例1:test.txt 返回test
+	           例2:d:\Demo\test.txt 返回test
+	           例3:d:\Demo\X.20131201.DATA.txt ucSuffixFlag=5 pucInputSuffix=".txt" 返回X.20131201.DATA
+	           例4:d:\Demo\X.20131201.DATA.txt ucSuffixFlag=1 返回X
+	           例5:d:\Demo\X.20131201.DATA.txt ucSuffixFlag=2 返回X.20131201.DATA
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetFileNamePrefix(unsigned char *pucInputFileName,unsigned char ucSuffixFlag,unsigned char *pucInputSuffix,unsigned char *pucOutputPrefix);
+
+/***********************************************************************************************
+	FuncName : Tool_GetFileNameSuffix
+	FuncFunc : 获取文件名的后缀
+	Input	 : unsigned char *	— pucInputFileName			输入文件名
+	Output	 : unsigned char *	— pucOutputSuffix			输出文件名的后缀
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+								— 其他错误,返回TOOL_FAILURE(0x01)
+								— 输入参数有误,返回TOOL_PARAMERROR(0x05)
+	Author	 : Sunrier
+	Date     : 2013-12-24 19:10:22
+	Descp    : 绝对路径或相对路径,此函数不检查文件是否已经存在
+	History  : 如:
+	           例1:test.txt 返回.txt
+	           例2:d:\Demo\test.txt 返回.txt
+	           例3:d:\Demo\X.20131201.DATA.txt 返回.txt
+	           例4:d:\Demo\X.20131201.DATA 返回.DATA
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetFileNameSuffix(unsigned char *pucInputFileName,unsigned char *pucOutputSuffix);
 
 /***********************************************************************************************
 	FuncName : Tool_CheckPathFile
@@ -5257,7 +6823,7 @@ EXPORT unsigned char Tool_GetNumberDBRecord(unsigned char *pucInputFilePathName,
 	Author		:  Sunrier
 	Date     	:  2011-07-18 19:13:21
 	Descp    	:  标准算法
-	History  	:  None
+	History  	:  3DES为24个字节为X9.52
 	Other    	:  None
 *************************************************************************************************/
 EXPORT unsigned char Tool_GetMac(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char *pucInputInitVector,unsigned char ucKeyType,unsigned char *pucInputMakKey,unsigned char *pucOutputData);
@@ -5336,11 +6902,33 @@ EXPORT unsigned char Tool_GetCupMac(unsigned char *pucInputData,unsigned int uiI
 	Author		:  Sunrier
 	Date     	:  2011-07-18 19:13:21
 	Descp    	:  Icc卡区分CBC算法和ECB算法,推荐使用CBC算法
-	History  	:  None
+	History  	:  3DES为24个字节为ICC X9.52
 	Other    	:  不足末尾追加0x80
 *************************************************************************************************/
 EXPORT unsigned char Tool_GetIccMac(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char *pucInputInitVector,unsigned char ucKeyType,unsigned char *pucInputMakKey,unsigned char ucMacType,unsigned char *pucOutputData);
 
+/***********************************************************************************************
+	FuncName 	:  Tool_GetStrToHexIccMac
+	FuncFunc 	:  获取报文字符串数据域1-8的鉴别码
+    Input	 	:  unsigned char *	—pucInputData 		输入的数据
+    			   unsigned int	 	—uiInputDataLen 	输入的数据长度
+    			   unsigned char *	—pucInputInitVector输入的初始向量数据
+    			   unsigned char 	—ucKeyType 		输入密钥类型 00-DES 0x01-2DES 0x02-3DES
+    			   unsigned char * 	—pucInputMakKey	输入加密密钥(DES为8字节或者2DES为16个字节或者3DES为24个字节)
+    			   unsigned char    —ucMacType 		Icc算法类型标志 0-CBC算法 1-ECB算法
+	Output	 	:  unsigned char * 	—pucOutputData  	输出Icc卡MAC(16个字节)
+	Return	 	:  unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
+								 	— 失败,返回TOOL_FAILURE(0x01)
+
+	Author		:  Sunrier
+	Date     	:  2011-07-18 19:13:21
+	Descp    	:  Icc卡区分CBC算法和ECB算法,推荐使用CBC算法
+	History  	:  输入和输出都是字符串格式
+	Other    	:  末尾追加0x80
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetStrToHexIccMac(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char *pucInputInitVector,
+									unsigned char ucKeyType,unsigned char *pucInputMakKey,unsigned char ucMacType,unsigned char *pucOutputData);
+									
 /***********************************************************************************************
 	FuncName 	:  Tool_GetCardMac
 	FuncFunc 	:  获取卡片MAC
@@ -5677,6 +7265,22 @@ EXPORT unsigned char Tool_Bak(unsigned char *pucAppName);
 EXPORT unsigned char Tool_GetPrivateData(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char ucPrivateType,unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
 
 /***********************************************************************************************
+	FuncName : Tool_CheckCardNo
+	FuncFunc : 检查卡号是否有效
+	Input	 : unsigned char *	— pucInputData		输入数据
+			   unsigned int 	— uiInputDataLen	输入数据长度
+	Output	 : None
+	Return	 : unsigned char	— 有效,返回TOOL_SUCCESS(0x00)
+					 			— 无效,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : Luhn算法
+	History  : 卡号的最后一位都是通过Luhn算法进行计算或校验
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_CheckCardNo(unsigned char *pucInputData,unsigned int uiInputDataLen);
+
+/***********************************************************************************************
 	FuncName : Tool_CheckId
 	FuncFunc : 检查身份证是否有效
 	Input	 : unsigned char *	— pucInputData		输入数据
@@ -5713,6 +7317,77 @@ EXPORT unsigned char Tool_CheckId(unsigned char *pucInputData,unsigned int uiInp
 	Other    : None
 *************************************************************************************************/
 EXPORT unsigned char Tool_GetIdInfo(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char ucFlag,unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_GetMonthInfoByIntValue
+	FuncFunc : 根据整型月份获取月份对应的字符串信息
+	Input	 : int				— iMonth,输入月份
+			   unsigned char 	— ucFlag,获取信息标志:			                                        
+			                                       	0-获取英文全称信息 
+			                                    	1-获取英文简称信息
+			                                    	2-获取英文全称(简称)信息
+			                                       	3-获取中文信息
+			                                       	4-获取中文(英文全称)信息
+			                                       	5-获取中文(英文简称)信息
+	Output	 : unsigned char *	— pucOutputData	输出数据
+			   unsigned int *	— puiOutputDataLen	输出数据长度
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+					 			— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : 输入iMonth=1,ucFlag=0,*pucOutputData="January"
+			   输入iMonth=10,ucFlag=0,*pucOutputData="October"
+	           输入iMonth=11,ucFlag=0,*pucOutputData="November"
+	           输入iMonth=12,ucFlag=0,*pucOutputData="December"
+	           输入iMonth=1,ucFlag=1,*pucOutputData="Jan"
+	           输入iMonth=1,ucFlag=2,*pucOutputData="January(Jan)"
+	           输入iMonth=1,ucFlag=3,*pucOutputData="一月"
+	           输入iMonth=1,ucFlag=4,*pucOutputData="一月(January)"
+	           输入iMonth=1,ucFlag=5,*pucOutputData="一月(Jan)"
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetMonthInfoByIntValue(int iMonth,unsigned char ucFlag,unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_GetMonthByStrValue
+	FuncFunc : 根据月份字符串获取月份对应的信息
+	Input	 : unsigned char *	— pucInputData,输入月份信息
+			   unsigned int 	— uiInputDataLen,输入月份信息的长度
+	Output	 : int *			— piOutputData,输出对应的月份
+	Return	 : unsigned char	— 成功,返回TOOL_SUCCESS(0x00)
+					 			— 失败,返回TOOL_FAILURE(0x01)
+	Author	 : Sunrier
+	Date     : 2011-04-21 19:10:22
+	Descp    : 如:
+	           输入"January",*piOutputData=1
+	           输入"February",*piOutputData=2
+	           输入"March",*piOutputData=3
+	           输入"April",*piOutputData=4
+	           输入"May",*piOutputData=5
+	           输入"June",*piOutputData=6
+	           输入"July",*piOutputData=7
+	           输入"August",*piOutputData=8
+	           输入"September",*piOutputData=9
+	           输入"October",*piOutputData=10
+	           输入"November",*piOutputData=11
+	           输入"December",*piOutputData=12
+	           输入"Jan",*piOutputData=1
+	           输入"Feb",*piOutputData=2
+	           输入"Mar",*piOutputData=3
+	           输入"Apr",*piOutputData=4
+	           输入"May",*piOutputData=5
+	           输入"Jun",*piOutputData=6
+	           输入"Jul",*piOutputData=7
+	           输入"Aug",*piOutputData=8
+	           输入"Sep",*piOutputData=9
+	           输入"Oct",*piOutputData=10
+	           输入"Nov",*piOutputData=11
+	           输入"Dec",*piOutputData=12
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetMonthByStrValue(unsigned char *pucInputData,unsigned int uiInputDataLen,int *piOutputData);
 
 /***********************************************************************************************
 	FuncName : Tool_VerifyManage
@@ -5924,19 +7599,37 @@ EXPORT unsigned char Tool_GetDescpFromCode(unsigned char ucRetCode,unsigned char
 EXPORT unsigned char Tool_DispCode(unsigned char ucRetCode);
 
 /***********************************************************************************************
-	FuncName : Tool_GetLibVersion
-	FuncFunc : 获取库版本
-	Input	 : None
-	Output	 : unsigned char *	— pucOutputData	当前库版本
+	FuncName : Tool_GetRevisionInfo
+	FuncFunc : 获取库版本修订信息
+	Input	 : unsigned int *	— puiOutputDataLen	输入修订信息的最大存储长度
+	Output	 : unsigned char *	— pucOutputData	输出修订信息
+	           unsigned int *	— puiOutputDataLen	输出修订信息的长度
 	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
 								— 失败,返回TOOL_FAILURE(0x01)
 	Author	 : Sunrier
-	Date     : 2016-06-05 19:00:55
+	Date     : 2012-06-05 19:00:55
 	Descp    : None
 	History  : None
 	Other    : None
 *************************************************************************************************/
-EXPORT unsigned char Tool_GetLibVersion(unsigned char *pucOutputData);
+EXPORT unsigned char Tool_GetRevisionInfo(unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
+
+/***********************************************************************************************
+	FuncName : Tool_GetLibVersion
+	FuncFunc : 获取库版本
+	Input	 : unsigned int *	— puiOutputDataLen	输入库版本的最大存储长度
+	Output	 : unsigned char *	— pucOutputData	输出当前库版本
+	           unsigned int *	— puiOutputDataLen	输出库版本的最大存储长度
+	Return	 : unsigned	char 	— 成功,返回TOOL_SUCCESS(0x00)
+								— 失败,返回TOOL_FAILURE(0x01)
+								— 无效参数,返回TOOL_PARAMERROR(0x05)
+	Author	 : Sunrier
+	Date     : 2012-06-05 19:00:55
+	Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+EXPORT unsigned char Tool_GetLibVersion(unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
 
 #ifdef __cplusplus   
 }  
@@ -5945,6 +7638,3 @@ EXPORT unsigned char Tool_GetLibVersion(unsigned char *pucOutputData);
 
 
 #endif 
-
-
-

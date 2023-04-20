@@ -32,13 +32,13 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	unsigned char aucKeyValue[APP_MAXBUFFER+1];		/*键值*/
 	unsigned char ucRetCode = APP_FAILURE;
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_GetCommCfg!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_GetCommCfg!");
 
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	
 	if( APP_SUCCESS!=Tool_IsExistFile(GLOBAL_DEFAULTCONFIGPATH,DEMOAPP_CONFIGFILENAME,0) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BaseApp_GetCommCfg fail!");
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BaseApp_GetCommCfg fail!");
 		return APP_FAILURE;
 	}
 	
@@ -75,7 +75,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 			g_mTermCfg.ucCommFlag = 1;
 		}
 
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CurrentCommMode[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CurrentCommMode[%s]!",aucKeyValue);
 	}
 
 	/*获取COMMPORT*/
@@ -124,7 +124,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 				g_mTermCfg.uiCommPort = COM9;
 			}
 
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "COMMPORT[%s]!",aucKeyValue);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "COMMPORT[%s]!",aucKeyValue);
 		}
 	}
 
@@ -137,7 +137,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	{
 		//if( COMM_TYPE_RS232==g_mTermCfg.ucCurrentCommMode )
 		{
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BAUDRATE[%s]!",aucKeyValue);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BAUDRATE[%s]!",aucKeyValue);
 			
 			switch( atol(aucKeyValue) )
 			{
@@ -169,7 +169,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	{
 		memset(g_mTermCfg.aucTCPIP1,0,sizeof(g_mTermCfg.aucTCPIP1));
 		memcpy(g_mTermCfg.aucTCPIP1,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP1[%s]!",aucKeyValue);
 	}
 
 	/*获取PORT1*/
@@ -177,10 +177,10 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","PORT1");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTCPHostPort1 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT1[%s]!",aucKeyValue);
 	}
 
 	/*获取IP2*/
@@ -192,7 +192,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	{
 		memset(g_mTermCfg.aucTCPIP2,0,sizeof(g_mTermCfg.aucTCPIP2));
 		memcpy(g_mTermCfg.aucTCPIP2,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP2[%s]!",aucKeyValue);
 	}
 	
 	/*获取PORT2*/
@@ -200,10 +200,10 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","PORT2");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTCPHostPort2 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT2[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https通讯时是否支持库的协议0-不支持 1-支持*/
@@ -214,7 +214,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x04;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPLIBFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPLIBFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https通讯时URL是否自解析0-不支持 1-支持*/
@@ -225,7 +225,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x01;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https是否支持URL自解析失败后尝试Host IP/Name 0-不支持 1-支持*/
@@ -236,7 +236,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x02;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLCOMMFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLCOMMFLAG[%s]!",aucKeyValue);
 	}
 
 	/*http或https接收的包是否不自解析:0-不解析 1-解析*/
@@ -247,7 +247,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x08;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOHTTPPARSEFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOHTTPPARSEFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https通讯时请求方法:0-POST方法 1-GET方法*/
@@ -258,7 +258,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucRequestWayFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPWAYFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPWAYFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https的URL*/
@@ -269,7 +269,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=256) ) )
 	{
 		strcpy(g_mTermCfg.aucHttpURL,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "URL[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "URL[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https的DOMAIN*/
@@ -280,7 +280,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucHttpDomain,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DOMAIN[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DOMAIN[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https的PAGE*/
@@ -291,7 +291,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucHttpPage,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PAGE[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PAGE[%s]!",aucKeyValue);
 	}
 
 	/*获取HOSTNAME1*/
@@ -302,7 +302,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucTCPDomainName1,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME1[%s]!",aucKeyValue);
 	}
 
 	/*获取HOSTNAME2*/
@@ -313,7 +313,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue)) )
 	{
 		strcpy(g_mTermCfg.aucTCPDomainName2,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME2[%s]!",aucKeyValue);
 	}
 	
 	memset(aucKeyName,0,sizeof(aucKeyName));
@@ -324,7 +324,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucBakCommFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BakCommFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BakCommFlag[%s]!",aucKeyValue);
 	}
 
 	/*获取HOSTNAMEFLAG主机域名标志*/
@@ -334,7 +334,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);	
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DomainNameFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DomainNameFlag[%s]!",aucKeyValue);
 		g_mTermCfg.ucDomainNameFlag = atoi((char *)aucKeyValue);
 	}
 	else
@@ -347,10 +347,10 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","RS232TIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usRS232Timeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "RS232Timeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "RS232Timeout[%s]!",aucKeyValue);
 	}
 
 	/*获取TcpTimeout*/
@@ -358,10 +358,10 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","TCPTIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTcpTimeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TcpTimeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TcpTimeout[%s]!",aucKeyValue);
 	}
 
 	/*获取SSL通讯标志*/
@@ -371,7 +371,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);	
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLFlag[%s]!",aucKeyValue);
 		g_mTermCfg.ucSSLFlag = atoi((char *)aucKeyValue);
 	}
 	else
@@ -384,10 +384,10 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","SSLTIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usSSLTimeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLTimeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLTimeout[%s]!",aucKeyValue);
 	}
 
 	/*服务器设定的IP*/
@@ -398,7 +398,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckValidIp(aucKeyValue)) )
 	{
 		strcpy(g_mTermCfg.aucTCPServerIP1,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerIP[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerIP[%s]!",aucKeyValue);
 	}
 
 	/*服务器监听PORT1*/
@@ -406,10 +406,10 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","TCPServerPort");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTCPServerPort1 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerPort[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerPort[%s]!",aucKeyValue);
 	}
 
 	/*TCP服务器阻塞时超时时间(S)*/
@@ -417,10 +417,10 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","TCPServerBlockTimeout");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTcpServerBlockTimeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerBlockTimeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TCPServerBlockTimeout[%s]!",aucKeyValue);
 	}
 
 	/*获取FTP IP1*/
@@ -432,7 +432,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	{
 		memset(g_mTermCfg.aucFTPServerIP1,0,sizeof(g_mTermCfg.aucFTPServerIP1));
 		memcpy(g_mTermCfg.aucFTPServerIP1,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP IP1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP IP1[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -444,10 +444,10 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","FTPPORT1");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usFTPServerPort1 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP PORT1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP PORT1[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -463,7 +463,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	{
 		memset(g_mTermCfg.aucFTPServerIP2,0,sizeof(g_mTermCfg.aucFTPServerIP2));
 		memcpy(g_mTermCfg.aucFTPServerIP2,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP IP2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP IP2[%s]!",aucKeyValue);
 	}
 	
 	/*获取FTP PORT2*/
@@ -471,10 +471,10 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","FTPPORT2");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usFTPServerPort2 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP PORT2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP PORT2[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -489,7 +489,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucFTPHostName1,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP HOSTNAME1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP HOSTNAME1[%s]!",aucKeyValue);
 	}
 
 	/*获取FTP HOSTNAME2*/
@@ -500,7 +500,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue)) )
 	{
 		strcpy(g_mTermCfg.aucFTPHostName2,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP HOSTNAME2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP HOSTNAME2[%s]!",aucKeyValue);
 	}
 
 	/*获取FTP BakCommFlag*/
@@ -512,7 +512,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucFTPSockBakFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP BakCommFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP BakCommFlag[%s]!",aucKeyValue);
 	}
 
 	/*获取FTP HOSTNAMEFLAG*/
@@ -522,7 +522,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);	
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP DomainNameFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP DomainNameFlag[%s]!",aucKeyValue);
 		g_mTermCfg.ucFTPHostNameFlag = atoi((char *)aucKeyValue);
 	}
 	else
@@ -538,7 +538,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucFTPUserName,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP User[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP User[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -553,7 +553,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucFTPUserPassword,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Password[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Password[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -569,7 +569,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	{
 		memset(g_mTermCfg.aucFTPLocalIP,0,sizeof(g_mTermCfg.aucFTPLocalIP));
 		memcpy(g_mTermCfg.aucFTPLocalIP,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Local IP[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Local IP[%s]!",aucKeyValue);
 	}
 	
 	/*获取FtpTimeout*/
@@ -577,10 +577,10 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	sprintf(aucKeyName,"%s","FTPTIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usFTPServerTimeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpTimeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FtpTimeout[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -595,7 +595,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=128) ) )
 	{
 		strcpy(g_mTermCfg.aucFTPLocalPath,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Local PATH[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Local PATH[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -611,7 +611,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=128) ) )
 	{
 		strcpy(g_mTermCfg.aucFTPRemotePath,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Remote PATH[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP Remote PATH[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -626,7 +626,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && (('I'==aucKeyValue[0]) || ('A'==aucKeyValue[0]) || ('E'==aucKeyValue[0])))
 	{
 		g_mTermCfg.aucFTPFileType[0] = aucKeyValue[0];
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP File Type[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP File Type[%s]!",aucKeyValue);
 	}
 	else
 	{
@@ -641,7 +641,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && (('0'==aucKeyValue[0]) || ('1'==aucKeyValue[0]) ) )
 	{
 		g_mTermCfg.ucFTPFileNullFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP FileNullFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP FileNullFlag[%s]!",aucKeyValue);
 	}
 
 	/*FTP Upload tmp file flag*/
@@ -652,7 +652,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucFTPUploadTmpFileFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP UploadTmpFileFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP UploadTmpFileFlag[%s]!",aucKeyValue);
 	}
 
 	/*FTP Del Remote file flag*/
@@ -663,7 +663,7 @@ unsigned char BaseApp_GetCommCfg(void *pDummy)
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucFTPDelRemoteFileFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP DelRemoteFileFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "FTP DelRemoteFileFlag[%s]!",aucKeyValue);
 	}
 	
 	return APP_SUCCESS;
@@ -686,19 +686,19 @@ unsigned char BaseApp_InitComm( void )
 {
 	unsigned char ucRetCode = 0;
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_InitComm");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_InitComm");
 	
 	AppUtils_DisplayLeft("通讯初始化...\n", LINE2);
 	AppUtils_DisplayLeft("请稍候...\n", LINE3);
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Comm_InitComm!");
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CommPort[COM%d],BaudRate[%d]!",g_mTermCfg.uiCommPort,g_mTermCfg.uiBaudRate);
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Comm_InitComm!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CommPort[COM%d],BaudRate[%d]!",g_mTermCfg.uiCommPort,g_mTermCfg.uiBaudRate);
 	
 	ucRetCode = Comm_InitComm(g_mTermCfg.uiCommPort,g_mTermCfg.uiBaudRate,g_mTermCfg.usRS232Timeout);	
 	if( APP_SUCCESS==ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Comm_InitSock!");
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BakCommFlag[%d],TCPIP1[%s],TCPHostPort1[%d],TCPIP2[%s],TCPHostPort2[%d],SelfHttpProtocolFlag[%d],HttpURL[%s],HttpRequestWayFlag[%d],TCPServerIP[%s],TCPServerPort[%d],TcpServerBlockTimeout[%d]!",
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Comm_InitSock!");
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BakCommFlag[%d],TCPIP1[%s],TCPHostPort1[%d],TCPIP2[%s],TCPHostPort2[%d],SelfHttpProtocolFlag[%d],HttpURL[%s],HttpRequestWayFlag[%d],TCPServerIP[%s],TCPServerPort[%d],TcpServerBlockTimeout[%d]!",
 							g_mTermCfg.ucBakCommFlag,g_mTermCfg.aucTCPIP1,g_mTermCfg.usTCPHostPort1,
 							g_mTermCfg.aucTCPIP2,g_mTermCfg.usTCPHostPort2,g_mTermCfg.ucSelfProtocolFlag,g_mTermCfg.aucHttpURL,g_mTermCfg.ucRequestWayFlag,g_mTermCfg.aucTCPServerIP1,g_mTermCfg.usTCPServerPort1,g_mTermCfg.usTcpServerBlockTimeout);
 
@@ -712,7 +712,7 @@ unsigned char BaseApp_InitComm( void )
 
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BaseApp_InitComm fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BaseApp_InitComm fail,ucRetCode[0x%02X]!",ucRetCode);
 	}
 	
 	return ucRetCode;
@@ -766,7 +766,7 @@ unsigned char BaseApp_Init(void *pDummy)
 {
 	unsigned char ucRetCode = APP_SUCCESS;
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,3,DEBUG, "Enter BaseApp_Init!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,3,DEBUG, "Enter BaseApp_Init!");
 
 	ucRetCode = BaseApp_GetCfg(pDummy);
 
@@ -775,7 +775,7 @@ unsigned char BaseApp_Init(void *pDummy)
 		ucRetCode = BaseApp_InitComm();
 		if( ucRetCode )
 		{
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BaseApp_InitComm fail,ucRetCode[0x%02X]!",ucRetCode);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BaseApp_InitComm fail,ucRetCode[0x%02X]!",ucRetCode);
 			return ucRetCode;
 		}
 	}
@@ -800,7 +800,7 @@ unsigned char BaseApp_DataType(void *pDummy)
 {
 	char *pcPrt  = NULL;
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_DataType!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_DataType!");
 	
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_GETDATATYPE;
@@ -874,7 +874,7 @@ unsigned char BaseApp_RsaTest(void *pDummy)
     RSAPRIVATEKEY_PRM rsa_pri_key;
 
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_DataType!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_DataType!");
 	
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_RSATEST;
@@ -1163,7 +1163,7 @@ unsigned char BaseApp_ProcData(unsigned char *pucInputData,unsigned int uiInputD
 	
 	unsigned int uiOffset = 0,uiParamLen = 0;
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_ProcData!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_ProcData!");
 
 	if( !Tool_CheckLogLevel(g_mApp.ucLogLevel,LOG_DEBUG) )
 	{
@@ -1179,7 +1179,7 @@ unsigned char BaseApp_ProcData(unsigned char *pucInputData,unsigned int uiInputD
 
 	if( (NULL==pucInputData) || (uiInputDataLen<2) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "接收数据包长度[%d]有误!",uiInputDataLen);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "接收数据包长度[%d]有误!",uiInputDataLen);
 		AppUtils_Warning("接收数据包长度有误!");
 		return APP_ESC;
 	}
@@ -1233,12 +1233,12 @@ unsigned char BaseApp_ServerStart(void *pDummy)
 	unsigned char aucClientIP[16];
 	unsigned short usClientPort;
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_ServerStart!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter BaseApp_ServerStart!");
 	
 	ucRetCode = BaseApp_Init((void*)3);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BaseApp_Init fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BaseApp_Init fail,ucRetCode[0x%02X]!",ucRetCode);
 		return ucRetCode;
 	}
 
@@ -1290,7 +1290,7 @@ RESTART:
 	ucRetCode = Comm_StartServer(g_mCurrTrans.ucCommFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_StartServer fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_StartServer fail,ucRetCode[0x%02X]!",ucRetCode);
 		return ucRetCode;
 	}
 
@@ -1312,16 +1312,16 @@ RELISTEN:
 			goto RESTART;
 		}
 
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckServerAccept fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckServerAccept fail,ucRetCode[0x%02X]!",ucRetCode);
 	}
 
 	if( g_mApp.ucCNTipFlag )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "客户端地址[%s],客户端端口号[%d]!",aucClientIP,usClientPort);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "客户端地址[%s],客户端端口号[%d]!",aucClientIP,usClientPort);
 	}
 	else
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Client IP[%s],Client Port[%d]!",aucClientIP,usClientPort);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Client IP[%s],Client Port[%d]!",aucClientIP,usClientPort);
 	}
 	
 	//server接收客户端通讯数据包
@@ -1336,7 +1336,7 @@ RELISTEN:
 	else if( ucRetCode )
 	{
 		Comm_StopServer(g_mCurrTrans.ucCommFlag);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_ServerRecvPacket fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_ServerRecvPacket fail,ucRetCode[0x%02X]!",ucRetCode);
 		AppUtils_Warning("服务器接收客户端数据包失败");
 		return ucRetCode;
 	}
@@ -1356,7 +1356,7 @@ RELISTEN:
 	if( ucRetCode )
 	{
 		Comm_StopClient(g_mCurrTrans.ucCommFlag);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_ServerSendPacket fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_ServerSendPacket fail,ucRetCode[0x%02X]!",ucRetCode);
 		//AppUtils_Warning("服务器发送数据包给客户端失败");
 		//return ucRetCode;
 		goto RELISTEN;
@@ -1450,7 +1450,7 @@ unsigned char BaseApp_Menu(void *pDummy)
 	
 	ucMenuOption = MENUOPT_INORDER | MENUOPT_EXEC_FUNC | MENUOPT_UP_DOWN_ARROW;
 	
-	return AppUtils_DisplayMenu(LINE1, aucDispTitleBuf, ucMenuOption, sizeof(aucMenuItem) / sizeof(AppUtils_MenuItem), aucMenuItem, 60);
+	return AppUtils_DisplayMenu(LINE1, aucDispTitleBuf, ucMenuOption, sizeof(aucMenuItem) / sizeof(AppUtils_MenuItem), aucMenuItem, 60, NULL);
 }
 
 

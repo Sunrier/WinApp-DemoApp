@@ -1840,22 +1840,23 @@ unsigned char AppUtils_ReadTrackEvent(unsigned int uiMaxLen,unsigned char *pucOu
 /***********************************************************************************************
 	FuncName : AppUtils_DisplayMenu
 	FuncFunc : 显示菜单
-	Input	 : unsigned char 		— ucStartLine			显示的起始行
-			   unsigned char *		— pucMenuTitle			菜单标题
-			   unsigned char 		— ucMenuOption			菜单设置状态
-			   unsigned char 		— ucMenuItemMaxCnt		用户菜单选项个数
-			   AppUtils_MenuItem * 	— UserMenuItem			用户菜单选项
-			   unsigned int 		— uiMenuTimeout		超时时间
+	Input	 : unsigned char 				— ucStartLine			显示的起始行
+			   unsigned char *				— pucMenuTitle			菜单标题
+			   unsigned char 				— ucMenuOption			菜单设置状态
+			   unsigned char 				— ucMenuItemMaxCnt		用户菜单选项个数
+			   AppUtils_MenuItem * 			— UserMenuItem			用户菜单选项
+			   unsigned int 				— uiMenuTimeout			超时时间
+			   unsigned char (*)(void) * 	— CallFunc				菜单执行完后的回调处理
 	Output	 : None
-	Return	 : unsigned char		— 成功,返回按键值
-									— 失败,返回超时(0x03)或取消(0x02)
+	Return	 : unsigned char				— 成功,返回按键值
+											— 失败,返回超时(0x03)或取消(0x02)
 	Author	 : Sunrier
 	Date     : 2013-08-05 19:12:55
 	Descp    : None
 	History  : None
 	Other    : None
 *************************************************************************************************/
-unsigned char AppUtils_DisplayMenu(unsigned char ucStartLine,unsigned char *pucMenuTitle,unsigned char ucMenuOption,unsigned char ucMenuItemMaxCnt,AppUtils_MenuItem UserMenuItem[],unsigned int uiMenuTimeout);
+unsigned char AppUtils_DisplayMenu(unsigned char ucStartLine,unsigned char *pucMenuTitle,unsigned char ucMenuOption,unsigned char ucMenuItemMaxCnt,AppUtils_MenuItem UserMenuItem[],unsigned int uiMenuTimeout,unsigned char (*CallFunc)(void));
 
 /***********************************************************************************************
 	FuncName : AppUtils_VerifyManage
@@ -1877,19 +1878,38 @@ unsigned char AppUtils_DisplayMenu(unsigned char ucStartLine,unsigned char *pucM
 unsigned char AppUtils_VerifyManage(unsigned char *pucInputData,unsigned int uiInputDataLen,unsigned char ucVerifyLevel);
 
 /***********************************************************************************************
-	FuncName : AppUtils_GetLibVersion
-	FuncFunc : 获取库版本
-	Input	 : None
-	Output	 : unsigned char *	— pucOutputData	当前库版本
+	FuncName : AppUtils_GetRevisionInfo
+	FuncFunc : 获取库版本修订信息
+	Input	 : unsigned int *	— puiOutputDataLen	输入修订信息的最大存储长度
+	Output	 : unsigned char *	— pucOutputData	输出修订信息
+	           unsigned int *	— puiOutputDataLen	输出修订信息的长度
 	Return	 : unsigned	char 	— 成功,返回APPUTILS_SUCCESS(0x00)
 								— 失败,返回APPUTILS_FAILURE(0x01)
+								— 失败,返回APPUTILS_PARAMERROR(0x05)
 	Author	 : Sunrier
-	Date     : 2015-12-05 19:00:55
+	Date     : 2012-06-05 19:00:55
 	Descp    : None
 	History  : None
 	Other    : None
 *************************************************************************************************/
-unsigned char AppUtils_GetLibVersion(unsigned char *pucOutputData);
+unsigned char AppUtils_GetRevisionInfo(unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
+
+/***********************************************************************************************
+	FuncName : AppUtils_GetLibVersion
+	FuncFunc : 获取库版本
+	Input	 : unsigned int *	— puiOutputDataLen	输入库版本的最大存储长度
+	Output	 : unsigned char *	— pucOutputData	输出当前库版本
+	           unsigned int *	— puiOutputDataLen	输出库版本的最大存储长度
+	Return	 : unsigned	char 	— 成功,返回APPUTILS_SUCCESS(0x00)
+								— 失败,返回APPUTILS_FAILURE(0x01)
+								— 失败,返回APPUTILS_PARAMERROR(0x05)
+	Author	 : Sunrier
+	Date     : 2012-06-05 19:00:55
+	Descp    : None
+	History  : None
+	Other    : None
+*************************************************************************************************/
+unsigned char AppUtils_GetLibVersion(unsigned char *pucOutputData,unsigned int *puiOutputDataLen);
 
 #ifdef __cplusplus   
 }  

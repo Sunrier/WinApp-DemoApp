@@ -296,13 +296,13 @@ unsigned char Trans_SetHttpComm( void )
 {
 	unsigned char ucRetCode = 0;
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_SetHttpComm");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_SetHttpComm");
 	
 	AppUtils_DisplayLeft("通讯初始化...\n", LINE2);
 	AppUtils_DisplayLeft("请稍候...\n", LINE3);
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Comm_InitComm!");
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CommPort[COM%d],BaudRate[%d]!",g_mTermCfg.uiCommPort,g_mTermCfg.uiBaudRate);
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Comm_InitComm!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CommPort[COM%d],BaudRate[%d]!",g_mTermCfg.uiCommPort,g_mTermCfg.uiBaudRate);
 	
 	ucRetCode = Comm_InitComm(g_mTermCfg.uiCommPort,g_mTermCfg.uiBaudRate,g_mTermCfg.usRS232Timeout);	
 	if( APP_SUCCESS==ucRetCode )
@@ -322,7 +322,7 @@ unsigned char Trans_SetHttpComm( void )
 
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Trans_SetHttpComm fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Trans_SetHttpComm fail,ucRetCode[0x%02X]!",ucRetCode);
 	}
 	
 	return ucRetCode;
@@ -351,11 +351,11 @@ unsigned char Trans_GetCfgInfor( void )
 
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_GetCfgInfor!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_GetCfgInfor!");
 	
 	if( APP_SUCCESS!=Tool_IsExistFile(GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucCfgFileName,0) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Trans_GetCfgInfor fail!");
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Trans_GetCfgInfor fail!");
 		return APP_FAILURE;
 	}
 	
@@ -391,7 +391,7 @@ unsigned char Trans_GetCfgInfor( void )
 			g_mTermCfg.ucCommFlag = 1;
 		}
 
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CurrentCommMode[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "CurrentCommMode[%s]!",aucKeyValue);
 	}
 
 	/*获取COMMPORT*/
@@ -440,7 +440,7 @@ unsigned char Trans_GetCfgInfor( void )
 				g_mTermCfg.uiCommPort = COM9;
 			}
 
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "COMMPORT[%s]!",aucKeyValue);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "COMMPORT[%s]!",aucKeyValue);
 		}
 	}
 
@@ -453,7 +453,7 @@ unsigned char Trans_GetCfgInfor( void )
 	{
 		//if( COMM_TYPE_RS232==g_mTermCfg.ucCurrentCommMode )
 		{
-			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BAUDRATE[%s]!",aucKeyValue);
+			Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BAUDRATE[%s]!",aucKeyValue);
 			
 			switch( atol(aucKeyValue) )
 			{
@@ -485,7 +485,7 @@ unsigned char Trans_GetCfgInfor( void )
 	{
 		memset(g_mTermCfg.aucTCPIP1,0,sizeof(g_mTermCfg.aucTCPIP1));
 		memcpy(g_mTermCfg.aucTCPIP1,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP1[%s]!",aucKeyValue);
 	}
 
 	/*获取PORT1*/
@@ -493,10 +493,10 @@ unsigned char Trans_GetCfgInfor( void )
 	sprintf(aucKeyName,"%s","PORT1");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTCPHostPort1 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT1[%s]!",aucKeyValue);
 	}
 
 	/*获取IP2*/
@@ -508,7 +508,7 @@ unsigned char Trans_GetCfgInfor( void )
 	{
 		memset(g_mTermCfg.aucTCPIP2,0,sizeof(g_mTermCfg.aucTCPIP2));
 		memcpy(g_mTermCfg.aucTCPIP2,aucKeyValue,strlen(aucKeyValue));
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "IP2[%s]!",aucKeyValue);
 	}
 	
 	/*获取PORT2*/
@@ -516,10 +516,10 @@ unsigned char Trans_GetCfgInfor( void )
 	sprintf(aucKeyName,"%s","PORT2");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTCPHostPort2 = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PORT2[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https通讯时是否支持库的协议0-不支持 1-支持*/
@@ -530,7 +530,7 @@ unsigned char Trans_GetCfgInfor( void )
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x04;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPLIBFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPLIBFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https通讯时URL是否自解析0-不支持 1-支持*/
@@ -541,7 +541,7 @@ unsigned char Trans_GetCfgInfor( void )
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x01;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https是否支持URL自解析失败后尝试Host IP/Name 0-不支持 1-支持*/
@@ -552,7 +552,7 @@ unsigned char Trans_GetCfgInfor( void )
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x02;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLCOMMFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOURLCOMMFLAG[%s]!",aucKeyValue);
 	}
 
 	/*http或https接收的包是否不自解析:0-不解析 1-解析*/
@@ -563,7 +563,7 @@ unsigned char Trans_GetCfgInfor( void )
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucSelfProtocolFlag = g_mTermCfg.ucSelfProtocolFlag | 0x08;
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOHTTPPARSEFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "AUTOHTTPPARSEFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https通讯时请求方法:0-POST方法 1-GET方法*/
@@ -574,7 +574,7 @@ unsigned char Trans_GetCfgInfor( void )
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucRequestWayFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPWAYFLAG[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HTTPWAYFLAG[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https的URL*/
@@ -596,7 +596,7 @@ unsigned char Trans_GetCfgInfor( void )
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucHttpDomain,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DOMAIN[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DOMAIN[%s]!",aucKeyValue);
 	}
 
 	/*获取http或https的PAGE*/
@@ -607,7 +607,7 @@ unsigned char Trans_GetCfgInfor( void )
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucHttpPage,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PAGE[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "PAGE[%s]!",aucKeyValue);
 	}
 
 	/*获取HOSTNAME1*/
@@ -618,7 +618,7 @@ unsigned char Trans_GetCfgInfor( void )
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue) && (strlen(aucKeyValue)<=64) ) )
 	{
 		strcpy(g_mTermCfg.aucTCPDomainName1,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME1[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME1[%s]!",aucKeyValue);
 	}
 
 	/*获取HOSTNAME2*/
@@ -629,7 +629,7 @@ unsigned char Trans_GetCfgInfor( void )
 	if( (APP_SUCCESS==ucRetCode) && (strlen(aucKeyValue)) )
 	{
 		strcpy(g_mTermCfg.aucTCPDomainName2,aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME2[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "HOSTNAME2[%s]!",aucKeyValue);
 	}
 
 	/*获取BakCommFlag*/
@@ -640,7 +640,7 @@ unsigned char Trans_GetCfgInfor( void )
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
 		g_mTermCfg.ucBakCommFlag = atoi((char *)aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BakCommFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "BakCommFlag[%s]!",aucKeyValue);
 	}
 
 	/*获取HOSTNAMEFLAG*/
@@ -650,7 +650,7 @@ unsigned char Trans_GetCfgInfor( void )
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);	
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DomainNameFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTCONFIGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "DomainNameFlag[%s]!",aucKeyValue);
 		g_mTermCfg.ucDomainNameFlag = atoi((char *)aucKeyValue);
 	}
 	else
@@ -663,10 +663,10 @@ unsigned char Trans_GetCfgInfor( void )
 	sprintf(aucKeyName,"%s","RS232TIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usRS232Timeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "RS232Timeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "RS232Timeout[%s]!",aucKeyValue);
 	}
 
 	/*获取TcpTimeout*/
@@ -674,10 +674,10 @@ unsigned char Trans_GetCfgInfor( void )
 	sprintf(aucKeyName,"%s","TCPTIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usTcpTimeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TcpTimeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "TcpTimeout[%s]!",aucKeyValue);
 	}
 
 	/*获取SSLFLAG*/
@@ -687,7 +687,7 @@ unsigned char Trans_GetCfgInfor( void )
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);	
 	if( (APP_SUCCESS==ucRetCode) && 1==strlen((char *)aucKeyValue) && ('1'==aucKeyValue[0]) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLFlag[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLFlag[%s]!",aucKeyValue);
 		g_mTermCfg.ucSSLFlag = atoi((char *)aucKeyValue);
 	}
 	else
@@ -700,10 +700,10 @@ unsigned char Trans_GetCfgInfor( void )
 	sprintf(aucKeyName,"%s","SSLTIMEOUT");
 	memset(aucKeyValue,0,sizeof(aucKeyValue));
 	ucRetCode = Tool_GetConfigStringValue(aucFileName,aucSectionName,aucKeyName,aucKeyValue);
-	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue)) )
+	if( (APP_SUCCESS==ucRetCode) && (APP_SUCCESS==Tool_CheckDigital(aucKeyValue,0)) )
 	{
 		g_mTermCfg.usSSLTimeout = atoi(aucKeyValue);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLTimeout[%s]!",aucKeyValue);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "SSLTimeout[%s]!",aucKeyValue);
 	}
 	
 	return APP_SUCCESS;
@@ -1112,7 +1112,7 @@ unsigned char Trans_TestServer(void *pDummy)
 	//unsigned int uiDataLen = 0,uiSendLen = 0,uiRecvLen = 0;
 	unsigned int uiLen = 0;
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_TestServer!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_TestServer!");
 
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_TESTSERVER;
@@ -1124,7 +1124,7 @@ unsigned char Trans_TestServer(void *pDummy)
 	ucRetCode = AppUtils_GetIpAddress(LINE2,"请输入服务器地址:",60,aucTmpBuf);
 	if( (APP_SUCCESS!=ucRetCode) || (!strlen(aucTmpBuf)) || (strlen(aucTmpBuf)>16) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"AppUtils_GetIpAddress fail,ucRetCode[%d]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"AppUtils_GetIpAddress fail,ucRetCode[%d]!",ucRetCode);
 		AppUtils_FormatDisp("获取服务器地址失败,ucRetCode[%d]\n",ucRetCode);
 		AppUtils_WaitKey(5);
 		return ucRetCode;
@@ -1136,7 +1136,7 @@ unsigned char Trans_TestServer(void *pDummy)
 	ucRetCode = AppUtils_GetNum(LINE2,"请输入服务器端口:",aucTmpBuf,1,6,60);
 	if( (APP_SUCCESS!=ucRetCode) || (!strlen(aucTmpBuf)) || (strlen(aucTmpBuf)>6) )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"AppUtils_GetNum fail,ucRetCode[%d]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"AppUtils_GetNum fail,ucRetCode[%d]!",ucRetCode);
 		AppUtils_FormatDisp("获取服务器端口失败,ucRetCode[%d]\n",ucRetCode);
 		AppUtils_WaitKey(5);
 		return ucRetCode;
@@ -1176,7 +1176,7 @@ unsigned char Trans_TestServer(void *pDummy)
 	ucRetCode = Comm_InitSock(aucTcpIp,usTCPHostPort,0,NULL,0,0,NULL,NULL,0,NULL,0,NULL,NULL,NULL,0,g_mTermCfg.usTcpServerBlockTimeout);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_InitSock fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_InitSock fail,ucRetCode[0x%02X]!",ucRetCode);
 		AppUtils_Warning("初始化失败");
 		return ucRetCode;
 	}
@@ -1185,7 +1185,7 @@ unsigned char Trans_TestServer(void *pDummy)
 	ucRetCode = Comm_CheckConnect(g_mCurrTrans.ucCommFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckConnect [%s:%d] fail,ucRetCode[0x%02X]!",aucTcpIp,usTCPHostPort,ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckConnect [%s:%d] fail,ucRetCode[0x%02X]!",aucTcpIp,usTCPHostPort,ucRetCode);
 		memset(aucTmpBuf,0,sizeof(aucTmpBuf));
 		Comm_GetDescpFromCode(ucRetCode,aucTmpBuf);
 		AppUtils_FormatDisp("连接服务器失败[%s:%d],ucRetCode[%d:%s]\n",aucTcpIp,usTCPHostPort,ucRetCode,aucTmpBuf);
@@ -1224,15 +1224,13 @@ unsigned char Trans_EchoTesting(void *pDummy)
 	unsigned char aucRecvBuf[APP_MAXCOMMBUF+1];
 	unsigned int uiDataLen = 0,uiSendLen = 0,uiRecvLen = 0;
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_EchoTesting!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_EchoTesting!");
 
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_ECHO_TESTING;
 
 	AppUtils_UserClear(LINE1);
 	Trans_DisplayTransName(g_mCurrTrans.ucTransType);
-
-
 
 	if( g_mTermCfg.ucSSLFlag )
 	{
@@ -1257,7 +1255,7 @@ unsigned char Trans_EchoTesting(void *pDummy)
 	ucRetCode = Comm_CheckConnect(g_mCurrTrans.ucCommFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckConnect [ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckConnect [ucRetCode=0x%02X]!",ucRetCode);
 		return ucRetCode;
 	}
 
@@ -1274,7 +1272,7 @@ unsigned char Trans_EchoTesting(void *pDummy)
 	if( ucRetCode )
 	{
 		Comm_Disconnect(0);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_SendPacket [ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_SendPacket [ucRetCode=0x%02X]!",ucRetCode);
 		AppUtils_Warning("发送数据包失败");
 		return ucRetCode;
 	}
@@ -1286,7 +1284,7 @@ unsigned char Trans_EchoTesting(void *pDummy)
 	if( ucRetCode )
 	{
 		Comm_Disconnect(0);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_RecvPacket [ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_RecvPacket [ucRetCode=0x%02X]!",ucRetCode);
 		AppUtils_Warning("接收数据包失败");
 		return ucRetCode;
 	}
@@ -1319,7 +1317,7 @@ unsigned char Trans_VerifyData(void *pDummy)
 	unsigned char aucRecvBuf[APP_MAXCOMMBUF+1];
 	unsigned int uiDataLen = 0,uiSendLen = 0,uiRecvLen = 0;
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_VerifyData!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_VerifyData!");
 
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_ECHO_TESTING;
@@ -1371,7 +1369,7 @@ unsigned char Trans_VerifyData(void *pDummy)
 	ucRetCode = Comm_CheckConnect(g_mCurrTrans.ucCommFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckConnect fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckConnect fail,ucRetCode[0x%02X]!",ucRetCode);
 		AppUtils_Warning("连接服务器失败");
 		return ucRetCode;
 	}
@@ -1389,7 +1387,7 @@ unsigned char Trans_VerifyData(void *pDummy)
 	if( ucRetCode )
 	{
 		Comm_Disconnect(0);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_SendPacket fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_SendPacket fail,ucRetCode[0x%02X]!",ucRetCode);
 		AppUtils_Warning("发送数据包失败");
 		return ucRetCode;
 	}
@@ -1401,7 +1399,7 @@ unsigned char Trans_VerifyData(void *pDummy)
 	if( ucRetCode )
 	{
 		Comm_Disconnect(0);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_RecvPacket fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_RecvPacket fail,ucRetCode[0x%02X]!",ucRetCode);
 		AppUtils_Warning("接收数据包失败");
 		return ucRetCode;
 	}
@@ -1434,7 +1432,7 @@ unsigned char Trans_Test(void *pDummy)
 	unsigned char aucRecvBuf[APP_MAXCOMMBUF+1];
 	unsigned int uiDataLen = 0,uiSendLen = 0,uiRecvLen = 0;
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_Test!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_Test!");
 
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_ECHO_TESTING;
@@ -1477,7 +1475,7 @@ unsigned char Trans_Test(void *pDummy)
 	ucRetCode = Comm_CheckConnect(g_mCurrTrans.ucCommFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckConnect fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckConnect fail,ucRetCode[0x%02X]!",ucRetCode);
 		AppUtils_Warning("连接服务器失败");
 		return ucRetCode;
 	}
@@ -1499,7 +1497,7 @@ unsigned char Trans_Test(void *pDummy)
 	if( ucRetCode )
 	{
 		Comm_Disconnect(0);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_SendPacket [ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_SendPacket [ucRetCode=0x%02X]!",ucRetCode);
 		AppUtils_Warning("发送数据包失败");
 		return ucRetCode;
 	}
@@ -1511,7 +1509,7 @@ unsigned char Trans_Test(void *pDummy)
 	if( ucRetCode )
 	{
 		Comm_Disconnect(0);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_RecvPacket [ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_RecvPacket [ucRetCode=0x%02X]!",ucRetCode);
 		AppUtils_Warning("接收数据包失败");
 		return ucRetCode;
 	}
@@ -1549,7 +1547,7 @@ unsigned char Trans_HttpTesting(void *pDummy)
 	//unsigned char aucCode[6+1];
 	//unsigned char aucTmpBuf[256+1];
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter Trans_HttpTesting!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Enter Trans_HttpTesting!");
 
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_TESTHTTP;
@@ -1614,7 +1612,7 @@ unsigned char Trans_HttpTesting(void *pDummy)
 	ucRetCode = Comm_CheckConnect(g_mCurrTrans.ucCommFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_CheckConnect [ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_CheckConnect [ucRetCode=0x%02X]!",ucRetCode);
 		AppUtils_Warning("连接服务器失败");
 		return ucRetCode;
 	}
@@ -1634,7 +1632,7 @@ unsigned char Trans_HttpTesting(void *pDummy)
 	if( ucRetCode )
 	{
 		Comm_Disconnect(0);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_SendPacket [ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_SendPacket [ucRetCode=0x%02X]!",ucRetCode);
 		AppUtils_Warning("发送数据包失败");
 		return ucRetCode;
 	}
@@ -1646,7 +1644,7 @@ unsigned char Trans_HttpTesting(void *pDummy)
 	if( ucRetCode )
 	{
 		Comm_Disconnect(0);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_RecvPacket [ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG,"Comm_RecvPacket [ucRetCode=0x%02X]!",ucRetCode);
 		AppUtils_Warning("接收数据包失败");
 		return ucRetCode;
 	}
@@ -1679,7 +1677,7 @@ unsigned char Trans_Tcp(void *pDummy)
 	unsigned char aucRecvBuf[APP_MAXCOMMBUF+1];
 	unsigned int uiDataLen = 0,uiSendLen = 0,uiRecvLen = 0;
 
-	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_Tcp!");
+	Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_DEBUG,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Enter Trans_Tcp!");
 
 	memset(&g_mCurrTrans,0,sizeof(Trans_Prm));
 	g_mCurrTrans.ucTransType = TTYPE_ECHO_TESTING;
@@ -1722,7 +1720,7 @@ unsigned char Trans_Tcp(void *pDummy)
 	ucRetCode = Comm_CheckConnect(g_mCurrTrans.ucCommFlag);
 	if( ucRetCode )
 	{
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckConnect fail,ucRetCode[0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_CheckConnect fail,ucRetCode[0x%02X]!",ucRetCode);
 		AppUtils_Warning("连接服务器失败");
 		return ucRetCode;
 	}
@@ -1744,7 +1742,7 @@ unsigned char Trans_Tcp(void *pDummy)
 	if( ucRetCode )
 	{
 		Comm_Disconnect(0);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_SendPacket [ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_SendPacket [ucRetCode=0x%02X]!",ucRetCode);
 		AppUtils_Warning("发送数据包失败");
 		return ucRetCode;
 	}
@@ -1756,7 +1754,7 @@ unsigned char Trans_Tcp(void *pDummy)
 	if( ucRetCode )
 	{
 		Comm_Disconnect(0);
-		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_RecvPacket [ucRetCode=0x%02X]!",ucRetCode);
+		Tool_TraceLog(1,g_mApp.ucLogLevel,LOG_CHECK_ERROR,GLOBAL_DEFAULTLOGPATH,g_mApp.aucLogFileName,0,2,DEBUG, "Comm_RecvPacket [ucRetCode=0x%02X]!",ucRetCode);
 		AppUtils_Warning("接收数据包失败");
 		return ucRetCode;
 	}
@@ -1846,7 +1844,7 @@ unsigned char Trans_Menu(void *pDummy)
 	
 	ucMenuOption = MENUOPT_INORDER | MENUOPT_EXEC_FUNC | MENUOPT_UP_DOWN_ARROW;
 	
-	return AppUtils_DisplayMenu(LINE1, aucDispTitleBuf, ucMenuOption, sizeof(aucMenuItem) / sizeof(AppUtils_MenuItem), aucMenuItem, 60);
+	return AppUtils_DisplayMenu(LINE1, aucDispTitleBuf, ucMenuOption, sizeof(aucMenuItem) / sizeof(AppUtils_MenuItem), aucMenuItem, 60, NULL);
 }
 
 
